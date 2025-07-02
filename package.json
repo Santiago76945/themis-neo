@@ -1,0 +1,39 @@
+{
+  "name": "themis-legal-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "netlify:dev": "netlify dev"
+  },
+  "dependencies": {
+    "@netlify/functions": "^3.0.4",
+    "cloudinary": "^2.6.0",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^13.4.0",
+    "mongoose": "^8.13.2",
+    "next": "15.3.0",
+    "openai": "^5.8.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typeit": "^8.8.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@netlify/plugin-nextjs": "^5.11.4",
+    "@tailwindcss/postcss": "^4",
+    "@types/jquery": "^3.5.32",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/styled-jsx": "^2.2.9",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.0",
+    "netlify-cli": "^15.8.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

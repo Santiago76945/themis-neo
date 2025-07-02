@@ -1,0 +1,349 @@
+/* src/styles/global.css 
+ * Themis App - Global Styles
+ *
+ * Lineamientos generales:
+ * - Diseño basado en superficies elevadas: fondo oscuro profundo y contenedores ("cards") con fondo ligeramente más claro y sombra sutil.
+ * - Paleta de colores: tonos negros/grises (#121212, #1e1e1e, #2c2c2e, #3c3c3d), acento champagne/beige (#f7e7ce) para elementos interactivos.
+ * - Tipografía: familia de sistema; tamaños y pesos definidos con variables CSS.
+ * - Espaciado: sistema de espaciados modulables (--space-1, --space-2, ...).
+ * - Estructura: cada sección dentro de un .container con márgenes horizontales y verticales equilibrados.
+ * - Componentes: botones, inputs y enlaces reutilizan las variables y transiciones homogéneas.
+ */
+
+/* Variables CSS */
+
+:root {
+  /* Colores */
+  --color-background: #121212;
+  --color-surface:    #1e1e1e;
+  --color-on-surface: #e0e0e0;
+  --color-border:     #3c3c3d;
+  --color-accent:     #f7e7ce;
+  --color-divider:    #3c3c3d;
+  --color-link:       var(--color-accent);
+  --color-link-hover: #d9c9b2;
+
+  /* Degradados botones */
+  --gradient-start: #1a1a1a;
+  --gradient-end:   #2a2a2a;
+
+  /* Tipografía */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.5rem;
+  --font-weight-normal: 400;
+  --font-weight-bold:   600;
+
+  /* Espaciado */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+
+  /* Breakpoints */
+  --breakpoint-sm:  640px;
+  --breakpoint-md:  768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+}
+
+/* Reset Global */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;  /* centra verticalmente */
+  align-items: center;      /* centra horizontalmente; quítalo si no lo necesitas */
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+/* Tipografía y elementos base */
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-2);
+}
+
+p {
+  margin-bottom: var(--space-2);
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
+
+ul, ol {
+  padding-left: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+
+/* Layout y contenedores */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.container {
+  margin: 0 var(--space-2);
+  padding: 0 var(--space-2);
+  text-align: center;
+}
+
+/* Componentes – Tarjetas */
+.card {
+  background-color: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: none;
+  margin: var(--space-4) auto;
+  position: relative;
+  z-index: 10;
+  text-align: left;
+  padding: var(--space-4);
+}
+
+.card-secondary {
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  padding: var(--space-3);
+  margin: var(--space-3) 0;
+  text-align: left;
+}
+
+/* Componentes – Botones */
+.btn {
+  display: inline-block;
+  padding: var(--space-2) var(--space-3);
+  
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  color: var(--color-accent);
+  text-align: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+.btn-secondary {
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+  margin-bottom: 20px;
+}
+/* Uniformidad de altura y centrado interno */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-link {
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+}
+/* Separación automática entre botones */
+.btn + .btn {
+  margin-left: var(--space-2);
+}
+/* Estilos para botones de enlace */
+.btn-link {
+  background: none;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.btn-link:hover {
+  background: var(--gradient-end);
+  transform: translateY(-2px);
+}
+/* Contenedor de acciones (botones agrupados) */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.actions .btn {
+  margin-left: 0 !important;
+}
+
+
+/* Formularios e inputs */
+.input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: #2c2c2e;
+  color: var(--color-on-surface);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: var(--space-3);
+}
+.input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 5px var(--color-accent);
+}
+/* Opciones en selects con fondo oscuro */
+.input option,
+.input optgroup {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+}
+/* Estructura de formularios */
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+}
+.field label {
+  margin-bottom: var(--space-1);
+  font-weight: var(--font-weight-bold);
+}
+.actionsForm {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+/* Buscador */
+.search {
+  margin: var(--space-4) 0 var(--space-2);
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+/* Utilidades (espaciado y helpers) */
+/* Márgenes rápidas */
+.mt-1 { margin-top: var(--space-1) !important; }
+.mt-2 { margin-top: var(--space-2) !important; }
+.mt-3 { margin-top: var(--space-3) !important; }
+.mb-1 { margin-bottom: var(--space-1) !important; }
+.mb-2 { margin-bottom: var(--space-2) !important; }
+.mb-3 { margin-bottom: var(--space-3) !important; }
+/* Evita scroll horizontal */
+html, body {
+  overflow-x: hidden;
+}
+
+
+/* Divisores y enlaces */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-divider);
+  margin: var(--space-4) 0;
+}
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+a:hover {
+  color: var(--color-link-hover);
+}
+
+/* Modal overlay */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-4);
+  z-index: 1000;
+}
+
+/* Modal content box */
+.modalContent {
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  padding: var(--space-4);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Footer inside modal */
+.modalFooter {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-3);
+}
+
+/* Card – ítems interactivos */
+
+.card ul li {
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  padding: var(--space-1) var(--space-1);
+}
+.card ul li:hover {
+  background-color: #2c2c2e;         /* un tono ligeramente más claro */
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+  cursor: pointer;                    /* cursor de mano al pasar */
+}
+

@@ -1,0 +1,153 @@
+/* src/components/styles/LoginForm.module.css */
+
+/* Tarjeta principal */
+.card {
+  background-color: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  max-width: 400px;
+  width: 80vw;
+  padding: var(--space-4);
+  margin: var(--space-2) auto;
+  position: relative;
+  z-index: 10;
+  text-align: left;
+}
+
+/* Espaciado interno entre hijos de la tarjeta */
+.card > * + * {
+  margin-top: var(--space-3);
+}
+
+/* Contenedor del logo */
+.logoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Imagen del logo */
+.logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: var(--space-1);
+}
+
+/* Títulos del logo */
+.logoTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  text-shadow: 0 0 8px var(--color-accent);
+}
+.logoSubtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-on-surface);
+  text-align: center;
+}
+
+/* Formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Campos de entrada */
+.input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: #2c2c2e;
+  color: var(--color-on-surface);
+  font-size: var(--font-size-base);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 5px var(--color-accent);
+}
+
+/* Botones genéricos */
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  text-align: center;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+/* Botón principal */
+.btnPrimary {
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+  color: var(--color-accent);
+}
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+
+/* Botón secundario */
+.btnSecondary {
+  background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+  color: var(--color-accent);
+}
+.btnSecondary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+}
+
+/* Botones de redes sociales */
+.btnGoogle {
+  background: linear-gradient(45deg, #3c3c3d, #4c4c4d);
+  color: var(--color-accent);
+}
+.btnApple {
+  background: linear-gradient(45deg, #101010, #202020);
+  color: var(--color-accent);
+}
+.btnGoogle:hover,
+.btnApple:hover {
+  transform: translateY(-2px);
+}
+
+/* Contenedor de botones sociales */
+.socialButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Enlace de texto */
+.textLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--color-link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.textLink:hover {
+  color: var(--color-link-hover);
+}
+
+/* Separador */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-divider);
+  margin: var(--space-4) 0;
+}
+
+/* Pie de página */
+.copyright {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666666;
+}

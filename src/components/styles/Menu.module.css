@@ -1,0 +1,143 @@
+/* src/components/styles/Menu.module.css */
+
+/* Header del Dashboard */
+.menuHeader {
+  border: 2px solid var(--color-accent);
+  border-radius: 8px;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+/* Título y subtítulo */
+.menuTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+.menuSubtitle {
+  font-size: var(--font-size-lg);
+  line-height: 1.4;
+  color: var(--color-on-surface);
+}
+
+/* Sección de invitaciones pendientes */
+.invitationsCard {
+  margin-bottom: var(--space-4);
+}
+.invitationHeader {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-3);
+  color: var(--color-on-surface);
+}
+.invitationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+.invitationActions .btn {
+  margin-left: var(--space-2);
+}
+
+/* Grid responsivo de ítems: 2 columnas mínimo en móviles */
+.menuNav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  align-items: stretch;      /* Fuerza altura uniforme */
+  justify-items: center;     /* Centra cada celda */
+}
+
+/* Cada contenedor de ítem */
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Botón: ocupa todo el alto de la celda */
+.menuButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) var(--space-2);
+  background: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  color: var(--color-on-surface);
+  font-size: var(--font-size-base);
+  transition: background 0.3s ease, transform 0.2s ease;
+  position: relative;
+  text-align: center;
+}
+
+/* Icono dentro del botón */
+.icon {
+  width: 48px;
+  height: 48px;
+  filter: brightness(0) invert(1);
+  margin-bottom: var(--space-2);
+}
+
+/* Etiqueta de texto bajo el icono */
+.menuLabel {
+  margin-top: var(--space-1);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-on-surface);
+}
+
+/* Badge ‘Próximamente’ */
+.badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: #e63946;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-bold);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Estados del botón */
+.menuButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.menuButton:not(:disabled):hover {
+  background: var(--gradient-end);
+  transform: translateY(-2px);
+}
+
+/* Ajustes para pantallas muy angostas */
+@media (max-width: var(--breakpoint-sm)) {
+  .menuNav {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+/* Limita la altura de la card al viewport y organiza en columna */
+.menuCard {
+  max-height: 85dvh;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Hace scroll sólo en la zona de navegación */
+.menuNav {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Asegura que la card no tenga márgenes propios */
+.menuCard {
+  margin: 0; 
+}

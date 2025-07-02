@@ -1,0 +1,16 @@
+/* src/styles/GestionCasos.module.css */
+
+/* Lista de casos */
+.caseList {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Acciones de cada caso */
+.caseActions {
+  margin-top: var(--space-2);
+}
+.caseActions .btn + .btn {
+  margin-left: var(--space-2);
+}
+
