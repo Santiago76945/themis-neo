@@ -1,18 +1,21 @@
 // src/app/api/transcriptions/[id]/route.ts
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import Transcription from "@/lib/models/Transcription";
 import { verifyIdToken } from "@/lib/firebaseAdmin";
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: { id: string } }
+) {
     try {
         // 1. Autenticación
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid: userUid } = await verifyIdToken(idToken);
 
-        // 2. Borrar sólo si pertenece al usuario
+        // 2. Conexión y borrado
         await connectToDatabase();
         const doc = await Transcription.findOneAndDelete({
             _id: params.id,
@@ -20,7 +23,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         });
 
         if (!doc) {
-            return NextResponse.json({ error: "No encontrado o sin permiso" }, { status: 404 });
+            return NextResponse.json(
+                { error: "No encontrado o sin permiso" },
+                { status: 404 }
+            );
         }
 
         return NextResponse.json({ success: true }, { status: 200 });
