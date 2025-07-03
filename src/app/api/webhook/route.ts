@@ -1,44 +1,46 @@
 // src/app/api/webhook/route.ts
-
+// ——————————————————————————————————————————————————————————————————————————————————————————————
 import { NextRequest, NextResponse } from "next/server";
-// Importar con require y tiparlo como any
+// Import as any too
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mercadopago: any = require("mercadopago");
 
 export async function POST(req: NextRequest) {
-    // —— Validaciones en runtime ——
+    // Ensure env vars are present at runtime
     if (!process.env.MP_ACCESS_TOKEN) {
-        console.error("Falta MP_ACCESS_TOKEN en entorno de ejecución");
+        console.error("Missing MP_ACCESS_TOKEN");
         return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
     }
     if (!process.env.MP_WEBHOOK_SECRET) {
-        console.error("Falta MP_WEBHOOK_SECRET en entorno de ejecución");
+        console.error("Missing MP_WEBHOOK_SECRET");
         return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
     }
 
-    // Configuramos el SDK **aquí**, no al importar
+    // Configure the SDK here (not at top-level)
     mercadopago.configure({
         access_token: process.env.MP_ACCESS_TOKEN,
     });
 
-    // Verificar la clave secreta del webhook
+    // Verify your own webhook secret header
     const receivedSecret = req.headers.get("x-secret-token");
-    const expectedSecret = process.env.MP_WEBHOOK_SECRET;
-    if (receivedSecret !== expectedSecret) {
-        console.error("Webhook: secreto inválido", receivedSecret);
+    if (receivedSecret !== process.env.MP_WEBHOOK_SECRET) {
+        console.error("Invalid webhook secret", receivedSecret);
         return new NextResponse(null, { status: 401 });
     }
 
-    // Parsear parámetros
     const topic = req.nextUrl.searchParams.get("topic");
     const id = req.nextUrl.searchParams.get("id");
 
     if (topic === "payment" && id) {
         try {
+            // call the SDK
             const payment = await mercadopago.payment.findById(Number(id));
-            if (payment.body.status === "approved") {
-                console.log("✅ PAGO APROBADO:", payment.body);
-                // Aquí tu lógica de acreditación de monedas…
+            // sometimes the SDK nests status under `body.status`, sometimes directly under `status`
+            const status =
+                payment.body?.status /* v1 style */ || payment.status /* v2 style */;
+            if (status === "approved") {
+                console.log("✅ PAGO APROBADO:", payment);
+                // … aquí tu lógica de acreditación de monedas
             }
         } catch (err) {
             console.error("❌ Error al verificar pago:", err);
