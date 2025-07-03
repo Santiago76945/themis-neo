@@ -3,7 +3,7 @@
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyIdToken } from "@/lib/firebaseAdmin";     
+import { verifyIdToken } from "@/lib/firebaseAdmin";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 interface Package {
@@ -26,14 +26,14 @@ const mpClient = new MercadoPagoConfig({
 
 export async function POST(request: NextRequest) {
     try {
-        // 1) Verificar ID token de Firebase
+        // 1) Verificar ID token de Firebase y extraer UID
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid } = await verifyIdToken(idToken);
 
-        // 2) Validar bundleId
+        // 2) Validar bundleId recibido
         const { bundleId } = (await request.json()) as { bundleId?: string };
-        const pkg = PACKAGES.find((p) => p.id === bundleId);
+        const pkg = PACKAGES.find(p => p.id === bundleId);
         if (!pkg) {
             return NextResponse.json({ error: "Bundle inválido" }, { status: 400 });
         }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
                 }],
                 metadata: {
                     uid,
-                    bundleId: pkg.id,
+                    bundle: pkg.id,
                 },
                 back_urls: {
                     success: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
@@ -61,10 +61,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // 3.1) Loguear back_urls para verificar configuración
-        console.log("MP back_urls:", preferenceResponse.back_urls);
-
-        // 4) Devolver init_point
+        // 4) Devolver init_point al cliente
         return NextResponse.json({ init_point: preferenceResponse.init_point });
     } catch (err: any) {
         console.error("POST /api/checkout error:", err);

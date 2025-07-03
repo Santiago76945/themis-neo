@@ -17,14 +17,14 @@ export default function SuccessPage() {
     }, [refreshCoins]);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.card}>
-                <h1 className={styles.title}>✅ ¡Gracias por tu compra!</h1>
-                <p className={styles.message}>
+        <div className={styles.successPageContainer}>
+            <div className={styles.successPageCard}>
+                <h1 className={styles.successPageTitle}>✅ ¡Gracias por tu compra!</h1>
+                <p className={styles.successPageMessage}>
                     Tu transacción se ha completado exitosamente. Tu saldo de ThemiCoins se ha actualizado.
                 </p>
                 <button
-                    className={styles.button}
+                    className={styles.successPageButton}
                     onClick={() => router.push("/menu/audio-transcription")}
                 >
                     Volver a Transcripciones
