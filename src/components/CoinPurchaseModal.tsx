@@ -3,8 +3,10 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import Popup from "./Popup";
 import styles from "@/components/styles/CoinPurchaseModal.module.css";
+import { createPreference } from "@/lib/mercadoPago";
 
 interface Package {
     id: string;
@@ -16,9 +18,9 @@ interface Package {
 }
 
 const PACKAGES: Package[] = [
-    { id: "basic",   label: "100 ThemiCoins",  amount: 100,  price: "$1499.99", note: "Prueba la magia ✨",   imageSrc: "/images/coins-basic.png" },
-    { id: "popular", label: "500 ThemiCoins",  amount: 500,  price: "$4.999",   note: "Favorito de usuarios 💚", imageSrc: "/images/coins-popular.png" },
-    { id: "premium", label: "1000 ThemiCoins", amount: 1000, price: "$8999.99", note: "Máximo ahorro 🏆",     imageSrc: "/images/coins-premium.png" },
+    { id: "basic", label: "100 ThemiCoins", amount: 100, price: "$1499.99", note: "Prueba la magia ✨", imageSrc: "/images/coins-basic.png" },
+    { id: "popular", label: "500 ThemiCoins", amount: 500, price: "$4.999", note: "Favorito de usuarios 💚", imageSrc: "/images/coins-popular.png" },
+    { id: "premium", label: "1000 ThemiCoins", amount: 1000, price: "$8999.99", note: "Máximo ahorro 🏆", imageSrc: "/images/coins-premium.png" },
 ];
 
 interface CoinPurchaseModalProps {
@@ -32,6 +34,26 @@ export default function CoinPurchaseModal({
     onClose,
     onPurchase,
 }: CoinPurchaseModalProps) {
+    const router = useRouter();
+
+    const handleBuy = async (pkg: Package) => {
+        try {
+            // Create Mercado Pago preference on the backend
+            const { body } = await createPreference([
+                {
+                    title: pkg.label,
+                    quantity: 1,
+                    unit_price: Number(pkg.price.replace(/[^0-9.-]+/g, "")),
+                },
+            ]);
+            // Redirect user to Mercado Pago checkout
+            window.location.href = body.init_point;
+        } catch (err: any) {
+            console.error("Error al iniciar checkout:", err);
+            alert("No se pudo iniciar la compra. Intenta de nuevo.");
+        }
+    };
+
     if (!visible) return null;
 
     return (
@@ -51,7 +73,7 @@ export default function CoinPurchaseModal({
                         <p className={styles.coinPackagePrice}>{pkg.price}</p>
                         <button
                             className={styles.coinPackageBtn}
-                            onClick={() => onPurchase(pkg.amount)}
+                            onClick={() => handleBuy(pkg)}
                         >
                             Obtener
                         </button>
@@ -66,8 +88,10 @@ export default function CoinPurchaseModal({
             </div>
 
             <div className={styles.coinExplanation}>
-                ¿Tienes grabaciones de audio —una llamada clave con un cliente o la reunión de tu equipo capturada en tu app de notas de voz?  
-                Con <strong>Themis AI</strong> convierte esos archivos en texto en segundos, ¡como por arte de magia!
+                ¿Tienes grabaciones de audio —una llamada clave con un cliente o la reunión
+                de tu equipo capturada en tu app de notas de voz?
+                Con <strong>Themis AI</strong> convierte esos archivos en texto en segundos,
+                ¡como por arte de magia!
             </div>
 
             <div className={styles.coinFooter}>

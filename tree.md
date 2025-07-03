@@ -14,6 +14,10 @@ THEMIS-NEO
 │  │  │  │  └─ route.ts                   ← GET & POST /api/coins
 │  │  │  ├─ createUserProfile
 │  │  │  │  └─ route.ts                   ← POST /api/createUserProfile
+│  │  │  ├─ checkout                       ← **Nuevo micro-servicio checkout**
+│  │  │  │  └─ route.ts                   ← POST /api/checkout
+│  │  │  ├─ webhook                        ← **Nuevo micro-servicio webhook**
+│  │  │  │  └─ route.ts                   ← POST /api/webhook
 │  │  │  └─ transcriptions                ← micro-servicio de transcripciones
 │  │  │     ├─ route.ts                   ← POST & GET /api/transcriptions
 │  │  │     └─ [id]
@@ -28,18 +32,20 @@ THEMIS-NEO
 │  │  │     └─ [id]
 │  │  │        └─ page.tsx                ← detalle de una transcripción
 │  │  │
+│  │  ├─ success.tsx                      ← **Nuevo** página “Gracias por tu compra”
 │  │  ├─ layout.tsx
 │  │  └─ page.tsx                         ← root redirect (login / menú)
 │  │
 │  ├─ components
 │  │  ├─ ConsoleEffect.tsx
 │  │  ├─ ConsoleEffectWrapper.tsx
-│  │  ├─ Popup.tsx                        ← **Nuevo componente reutilizable**
-│  │  ├─ CoinPurchaseModal.tsx            ← **Modal compra ThemiCoins**
+│  │  ├─ Popup.tsx                        ← componente reutilizable
+│  │  ├─ CoinPurchaseModal.tsx            ← modal compra ThemiCoins
+│  │  ├─ CheckoutButton.tsx               ← botón de redirección a MP Checkout
 │  │  └─ styles
 │  │     ├─ AudioTranscription.module.css
-│  │     ├─ CoinPurchaseModal.module.css  ← **Nuevo**
-│  │     ├─ Popup.module.css              ← **Nuevo**
+│  │     ├─ CoinPurchaseModal.module.css
+│  │     ├─ Popup.module.css
 │  │     ├─ Clients.module.css
 │  │     ├─ GestionCasos.module.css
 │  │     ├─ LoginForm.module.css
@@ -49,16 +55,17 @@ THEMIS-NEO
 │  │     └─ global.css
 │  │
 │  ├─ context
-│  │  └─ AuthContext.tsx                  ← ahora maneja `coinsBalance`
+│  │  └─ AuthContext.tsx                  ← ahora maneja `coinsBalance` + `refreshCoins`
 │  │
 │  ├─ lib
 │  │  ├─ models
 │  │  │  ├─ User.ts                       ← + coinsBalance
 │  │  │  └─ Transcription.ts              ← tokens + coinsCost
-│  │  ├─ apiClient.ts                     ← **Nuevo helper con fetch+Auth**
+│  │  ├─ apiClient.ts                     ← fetch+Auth + createCheckoutPreference
 │  │  ├─ db.ts
 │  │  ├─ firebase.ts
 │  │  ├─ firebaseAdmin.ts
+│  │  ├─ mercadoPago.ts                   ← configuración y createPreference
 │  │  ├─ uploadToFirebase.ts
 │  │  └─ … (otros helpers)
 │  │

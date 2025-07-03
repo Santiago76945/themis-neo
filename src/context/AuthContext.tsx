@@ -11,79 +11,85 @@ import {
     User as FirebaseUser,
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
-import { getCoinsBalance } from "@/lib/apiClient";
+import { getCoinsBalance, purchaseCoins } from "@/lib/apiClient";
 
 interface AuthContextProps {
     user: FirebaseUser | null;
     uniqueCode: string | null;
     coinsBalance: number;
-    coinsPerToken: number;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
     refreshCoins: () => Promise<void>;
+    buyCoins: (amount: number) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
     user: null,
     uniqueCode: null,
     coinsBalance: 0,
-    coinsPerToken: 0,
     signInWithGoogle: async () => { },
     signOut: async () => { },
     refreshCoins: async () => { },
+    buyCoins: async () => { },
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<FirebaseUser | null>(null);
     const [uniqueCode, setUniqueCode] = useState<string | null>(null);
     const [coinsBalance, setCoinsBalance] = useState<number>(0);
-    const [coinsPerToken, setCoinsPerToken] = useState<number>(0);
 
-    // Recarga el balance de coins desde la API
+    // Obtener saldo de ThemiCoins
     const refreshCoins = async () => {
         if (!user) return;
         try {
-            const { coins, coinsPerToken } = await getCoinsBalance();
+            const { coins } = await getCoinsBalance();
             setCoinsBalance(coins);
-            setCoinsPerToken(coinsPerToken);
-        } catch (e) {
-            console.error("Error cargando coinsBalance:", e);
+        } catch (err) {
+            console.error("Error cargando saldo de ThemiCoins:", err);
+        }
+    };
+
+    // Comprar coins y actualizar saldo
+    const buyCoins = async (amount: number) => {
+        if (!user) throw new Error("No autorizado");
+        try {
+            const { coins } = await purchaseCoins(amount);
+            setCoinsBalance(coins);
+        } catch (err) {
+            console.error("Error comprando ThemiCoins:", err);
+            throw err;
         }
     };
 
     useEffect(() => {
         const auth = getAuth(app);
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (!firebaseUser) {
+        const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+            if (!fbUser) {
                 setUser(null);
                 setUniqueCode(null);
                 setCoinsBalance(0);
-                setCoinsPerToken(0);
                 return;
             }
+            setUser(fbUser);
 
-            setUser(firebaseUser);
-            const token = await firebaseUser.getIdToken();
-
-            // 1) Crear ó recuperar perfil de usuario
+            // 1) Perfil de usuario
             try {
+                const token = await fbUser.getIdToken();
                 const res = await fetch("/api/createUserProfile", {
                     method: "POST",
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                if (!res.ok) {
-                    console.error("createUserProfile error:", await res.text());
-                    setUniqueCode(null);
-                } else {
+                if (res.ok) {
                     const data = await res.json();
                     setUniqueCode(data.uniqueCode);
+                } else {
+                    console.error("createUserProfile error:", await res.text());
                 }
             } catch (err) {
                 console.error("Error en createUserProfile:", err);
-                setUniqueCode(null);
             }
 
-            // 2) Cargar saldo de ThemiCoins y tarifa por token
+            // 2) Cargar saldo de coins
             await refreshCoins();
         });
 
@@ -94,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
-        // onAuthStateChanged se encargará de inicializar el perfil y balance
+        // El onAuthStateChanged manejará el resto
     };
 
     const signOut = async () => {
@@ -108,10 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user,
                 uniqueCode,
                 coinsBalance,
-                coinsPerToken,
                 signInWithGoogle,
                 signOut,
                 refreshCoins,
+                buyCoins,
             }}
         >
             {children}
