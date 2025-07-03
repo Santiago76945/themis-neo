@@ -7,10 +7,8 @@ import { verifyIdToken } from "@/lib/firebaseAdmin";
 
 export async function DELETE(
     request: Request,
-    context: { params: Record<string, string> }
+    { params }: { params: { id: string } }
 ) {
-    const { id } = context.params;  // id viene como string
-
     try {
         // 1. Autenticación
         const authHeader = request.headers.get("authorization") || "";
@@ -20,7 +18,7 @@ export async function DELETE(
         // 2. Conexión y borrado
         await connectToDatabase();
         const doc = await Transcription.findOneAndDelete({
-            _id: id,
+            _id: params.id,
             userUid,
         });
 
