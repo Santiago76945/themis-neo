@@ -1,5 +1,7 @@
 // src/app/api/webhook/route.ts
 
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import User from "@/lib/models/User";
@@ -7,11 +9,12 @@ import User from "@/lib/models/User";
 const mercadopago: any = require("mercadopago");
 
 export async function POST(req: NextRequest) {
-    // 1) Validar vars de entorno
+    // 1) Validar variables de entorno
     if (!process.env.MP_ACCESS_TOKEN || !process.env.MP_WEBHOOK_SECRET) {
         console.error("Missing MP_* env vars");
         return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
     }
+    // Configurar SDK
     mercadopago.configure({ access_token: process.env.MP_ACCESS_TOKEN });
 
     // 2) Verificar secreto del webhook
@@ -21,40 +24,51 @@ export async function POST(req: NextRequest) {
         return new NextResponse(null, { status: 401 });
     }
 
-    const topic = req.nextUrl.searchParams.get("topic");
-    const id = req.nextUrl.searchParams.get("id");
+    // 3) Parsear payload JSON (MP envía el evento en el body)
+    const body = await req.json();
+    const topic = body.type || body.topic;
+    const id = body.data?.id || body.id;
 
     if (topic === "payment" && id) {
         try {
-            // 3) Obtener datos del pago
-            const payment = await mercadopago.payment.get(Number(id));
+            console.log("🔔 Webhook recibido:", { topic, id, metadata: body.data?.metadata });
+            // Obtener detalle del pago
+            const paymentResponse = await mercadopago.payment.get(Number(id));
+            const payment = paymentResponse.body;
 
-            if (payment.body.status === "approved") {
-                // 4) Extraer metadata
-                const { uid, bundle } = payment.body.metadata || {};
+            if (payment.status === "approved") {
+                // 4) Extraer metadata alineada con checkout
+                const { uid, bundleId } = payment.metadata || {};
                 const creditMap: Record<string, number> = {
                     basic: 100,
                     popular: 500,
                     premium: 1000,
                 };
-                const credit = creditMap[bundle as string] || 0;
+                const credit = creditMap[bundleId as string] || 0;
 
                 if (uid && credit > 0) {
-                    // 5) Conectar y acreditar monedas en MongoDB
+                    // 5) Conectar a BD y acreditar monedas
                     await connectToDatabase();
-                    await User.findOneAndUpdate(
+                    const user = await User.findOneAndUpdate(
                         { uid },
-                        { $inc: { coinsBalance: credit } }
+                        { $inc: { coinsBalance: credit } },
+                        { new: true }
                     );
-                    console.log(`✅ Acreditadas ${credit} ThemiCoins al usuario ${uid}`);
+                    console.log(
+                        `✅ Acreditadas ${credit} ThemiCoins a uid=${uid}. Nuevo saldo:`,
+                        user?.coinsBalance
+                    );
                 } else {
-                    console.warn("Webhook: metadata incompleta", payment.body.metadata);
+                    console.warn("Webhook: metadata incompleta", payment.metadata);
                 }
+            } else {
+                console.log("Payment status no approved:", payment.status);
             }
         } catch (e) {
             console.error("❌ Error verificando/acreditando pago:", e);
         }
     }
 
+    // 6) Responder siempre 200 para MP
     return NextResponse.json({ received: true });
 }
