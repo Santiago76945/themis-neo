@@ -12,7 +12,7 @@ export default function SuccessPage() {
     const router = useRouter();
 
     useEffect(() => {
-        // Refresca el balance de monedas tras la compra
+        // Refresca el balance tras la compra/webhook
         refreshCoins();
     }, [refreshCoins]);
 
