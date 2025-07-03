@@ -8,6 +8,8 @@ export interface ITranscription extends Document {
     fileUrl: string;
     text: string;
     tokens: number;
+    fileSize?: number;     // tamaño en bytes del archivo procesado
+    sizeCost?: number;     // coste adicional por tamaño
     coinsCost: number;
     createdAt: Date;
 }
@@ -17,8 +19,10 @@ const TranscriptionSchema: Schema<ITranscription> = new Schema(
         userUid: { type: String, required: true, index: true },
         title: { type: String, required: true },
         fileUrl: { type: String, required: true },
-        text: { type: String, default: '' },       // ya no es required
-        tokens: { type: Number, default: 0 },      // ya no es required
+        text: { type: String, default: '' },
+        tokens: { type: Number, default: 0 },
+        fileSize: { type: Number, default: 0 },
+        sizeCost: { type: Number, default: 0 },
         coinsCost: { type: Number, required: true },
     },
     {

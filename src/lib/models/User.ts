@@ -7,6 +7,7 @@ export interface IUser extends Document {
     email: string;
     displayName: string;
     uniqueCode: string;
+    coinsBalance: number;   // saldo de ThemiCoins
 }
 
 const UserSchema: Schema<IUser> = new Schema<IUser>(
@@ -15,11 +16,14 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
         email: { type: String, required: true },
         displayName: { type: String, required: true },
         uniqueCode: { type: String, required: true, unique: true },
+        coinsBalance: { type: Number, required: true, default: 0 },
     },
     { timestamps: true }
 );
 
-// Avoid recompilation/model overwrite issues in serverless environments
-const User: Model<IUser> = (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', UserSchema);
+// Evitamos recrear el modelo en entornos serverless
+const User: Model<IUser> =
+    (mongoose.models.User as Model<IUser>) ||
+    mongoose.model<IUser>('User', UserSchema);
 
 export default User;

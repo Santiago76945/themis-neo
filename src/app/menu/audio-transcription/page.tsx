@@ -6,6 +6,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { uploadAudioFile } from "@/lib/uploadToFirebase";
+import {
+    getTranscriptions,
+    postTranscription,
+    deleteTranscription,
+} from "@/lib/apiClient";
+import CoinPurchaseModal from "@/components/CoinPurchaseModal";
 import styles from "@/components/styles/AudioTranscription.module.css";
 
 interface Transcription {
@@ -20,7 +26,7 @@ interface Transcription {
 
 export default function AudioTranscriptionPage() {
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, coinsBalance, refreshCoins } = useAuth();
 
     const [file, setFile] = useState<File | null>(null);
     const [title, setTitle] = useState("");
@@ -29,6 +35,7 @@ export default function AudioTranscriptionPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOption, setSortOption] = useState<"date" | "name">("date");
     const [transcripts, setTranscripts] = useState<Transcription[]>([]);
+    const [isModalOpen, setModalOpen] = useState(false);
 
     const COINS_PER_TOKEN = parseFloat(
         process.env.NEXT_PUBLIC_COINS_PER_TOKEN || "0"
@@ -39,16 +46,9 @@ export default function AudioTranscriptionPage() {
         if (!user) return;
         (async () => {
             try {
-                const token = await user.getIdToken();
-                const res = await fetch("/api/transcriptions", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    setTranscripts(data);
-                } else {
-                    console.error("API /transcriptions devolvió:", data);
-                }
+                const data = await getTranscriptions();
+                if (Array.isArray(data)) setTranscripts(data);
+                else console.error("API /transcriptions devolvió:", data);
             } catch (e) {
                 console.error("Error cargando transcripciones:", e);
             }
@@ -80,29 +80,19 @@ export default function AudioTranscriptionPage() {
             // 1. Subir el audio a Firebase Storage
             const fileUrl = await uploadAudioFile(file, user.uid);
 
-            // 2. Enviar al backend
-            const token = await user.getIdToken();
-            const res = await fetch("/api/transcriptions", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ title, fileUrl }),
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || "Error en la API");
-            }
-
-            const created: Transcription = await res.json();
+            // 2. Crear transcripción vía apiClient
+            const created: Transcription = await postTranscription({ title, fileUrl });
             setTranscripts((prev) => [created, ...prev]);
+
+            // Limpiar inputs
             setFile(null);
             setTitle("");
-        } catch (err: unknown) {
+
+            // Refrescar balance tras la transcripción
+            await refreshCoins();
+        } catch (err: any) {
             console.error("Transcribir:", err);
-            setError((err as Error).message || "Ocurrió un error al transcribir.");
+            setError(err.message || "Ocurrió un error al transcribir.");
         } finally {
             setIsProcessing(false);
         }
@@ -113,19 +103,11 @@ export default function AudioTranscriptionPage() {
         setError("");
         setIsProcessing(true);
         try {
-            const token = await user.getIdToken();
-            const res = await fetch(`/api/transcriptions/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || "Error al eliminar");
-            }
+            await deleteTranscription(id);
             setTranscripts((prev) => prev.filter((t) => t._id !== id));
-        } catch (err: unknown) {
+        } catch (err: any) {
             console.error("Eliminar transcripción:", err);
-            setError((err as Error).message || "No se pudo eliminar la transcripción.");
+            setError(err.message || "No se pudo eliminar la transcripción.");
         } finally {
             setIsProcessing(false);
         }
@@ -143,16 +125,35 @@ export default function AudioTranscriptionPage() {
 
     return (
         <div className={`container ${styles.pageContainer}`}>
+            {/* Modal de compra de ThemiCoins */}
+            <CoinPurchaseModal
+                visible={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                onPurchase={async (amount: number) => {
+                    // Aquí llamarías a tu API de /api/coins para añadir coins
+                    await refreshCoins(); // refresca balance tras compra
+                    setModalOpen(false);
+                }}
+            />
+
             <div className={`card ${styles.transcriptionCard}`}>
                 <header className={styles.header}>
                     <h1 className={styles.pageTitle}>Transcripción de audio a texto</h1>
                     <div className={styles.headerControls}>
                         <div className={styles.coinCounter}>
-                            ThemiCoin por token: {COINS_PER_TOKEN}
+                            Saldo: {coinsBalance.toFixed(2)} ThemiCoin
                         </div>
                         <button
                             className={`btn ${styles.actionButton}`}
+                            onClick={() => setModalOpen(true)}
+                            disabled={isProcessing}
+                        >
+                            + Comprar
+                        </button>
+                        <button
+                            className={`btn ${styles.actionButton}`}
                             onClick={() => router.push("/menu")}
+                            disabled={isProcessing}
                         >
                             Volver al menú
                         </button>
@@ -243,7 +244,9 @@ export default function AudioTranscriptionPage() {
                                         <button
                                             className={`btn ${styles.actionButton}`}
                                             onClick={() =>
-                                                router.push(`/menu/audio-transcription/${t._id}`)
+                                                router.push(
+                                                    `/menu/audio-transcription/${t._id}`
+                                                )
                                             }
                                             disabled={isProcessing}
                                         >
@@ -251,7 +254,9 @@ export default function AudioTranscriptionPage() {
                                         </button>
                                         <button
                                             className={`btn ${styles.actionButton}`}
-                                            onClick={() => navigator.clipboard.writeText(t.text)}
+                                            onClick={() =>
+                                                navigator.clipboard.writeText(t.text)
+                                            }
                                             disabled={isProcessing}
                                         >
                                             Copiar
