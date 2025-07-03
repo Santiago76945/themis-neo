@@ -1,24 +1,23 @@
 // src/app/api/transcriptions/[id]/route.ts
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import Transcription from "@/lib/models/Transcription";
 import { verifyIdToken } from "@/lib/firebaseAdmin";
 
-export async function DELETE(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, context: any) {
+    const { id } = context.params; // extraemos el ID de la ruta
+
     try {
-        // 1. Autenticación
+        // Autenticación
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid: userUid } = await verifyIdToken(idToken);
 
-        // 2. Conexión y borrado
+        // Conexión y borrado
         await connectToDatabase();
         const doc = await Transcription.findOneAndDelete({
-            _id: params.id,
+            _id: id,
             userUid,
         });
 
