@@ -18,7 +18,7 @@ const PACKAGES: Package[] = [
     { id: "premium", label: "1000 ThemiCoins", amount: 1000, price: 5999.00 },
 ];
 
-// Instanciamos el cliente solo una vez
+// Instanciamos el cliente una sola vez con tu token
 const mpClient = new MercadoPagoConfig({
     accessToken: process.env.MP_ACCESS_TOKEN!,
 });
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Bundle inválido" }, { status: 400 });
         }
 
-        // Creamos la preferencia usando la nueva clase Preference
+        // Crear preferencia
         const preferenceClient = new Preference(mpClient);
         const preferenceResponse = await preferenceClient.create({
             body: {
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // En v2, `create()` devuelve ya el objeto con init_point, no dentro de .body
+        // La respuesta ya trae init_point directamente
         const init_point = preferenceResponse.init_point;
         return NextResponse.json({ init_point });
     } catch (err: any) {
