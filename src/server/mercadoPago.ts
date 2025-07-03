@@ -1,8 +1,11 @@
 // src/server/mercadoPago.ts
+// ————————————————————————————————————————————————————————————————
+// 1) Importamos con require y lo tipamos como `any`
+//    para evitar conflictos con la declaración de tipos oficial.
+// 2) Mantenemos este archivo bajo src/server para que Next.js
+//    lo considere solo en el servidor.
+// ————————————————————————————————————————————————————————————————
 
-// (This lives under src/server so it never enters your client bundle.)
-
-// import as a plain JS module
 const mercadopago: any = require("mercadopago");
 
 if (!process.env.MP_ACCESS_TOKEN) {
@@ -12,7 +15,7 @@ if (!process.env.NEXT_PUBLIC_BASE_URL) {
     throw new Error("NEXT_PUBLIC_BASE_URL must be defined in environment variables");
 }
 
-// Configure once at runtime
+// Configuramos el SDK de Mercado Pago (solo en server)
 mercadopago.configure({
     access_token: process.env.MP_ACCESS_TOKEN,
 });
@@ -24,7 +27,6 @@ mercadopago.configure({
 export async function createPreference(
     items: { title: string; quantity: number; unit_price: number }[]
 ) {
-    // preferencia v2 SDK: mercadopago.preferences.create(...)
     return mercadopago.preferences.create({
         items,
         back_urls: {

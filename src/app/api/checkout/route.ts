@@ -1,10 +1,6 @@
 // src/app/api/checkout/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-// Importamos tu helper desde src/server, que internamente hace:
-//    const mercadopago: any = require("mercadopago");
-//    mercadopago.configure({ access_token: … });
-//    export async function createPreference(…)
 import { createPreference } from "@/server/mercadoPago";
 
 interface Package {
@@ -14,7 +10,6 @@ interface Package {
     price: number;
 }
 
-// Tu catálogo de bundles, con precios numéricos
 const PACKAGES: Package[] = [
     { id: "basic", label: "100 ThemiCoins", amount: 100, price: 1499.99 },
     { id: "popular", label: "500 ThemiCoins", amount: 500, price: 3499.00 },
@@ -23,23 +18,16 @@ const PACKAGES: Package[] = [
 
 export async function POST(request: NextRequest) {
     try {
-        // 1. Parsear el body y buscar bundle
         const { bundleId } = await request.json();
         const pkg = PACKAGES.find((p) => p.id === bundleId);
         if (!pkg) {
             return NextResponse.json({ error: "Bundle inválido" }, { status: 400 });
         }
 
-        // 2. Crear la preferencia de pago en Mercado Pago
         const { body } = await createPreference([
-            {
-                title: pkg.label,
-                quantity: 1,
-                unit_price: pkg.price,
-            },
+            { title: pkg.label, quantity: 1, unit_price: pkg.price },
         ]);
 
-        // 3. Devolver la URL de inicio de Checkout
         return NextResponse.json({ init_point: body.init_point });
     } catch (err: any) {
         console.error("POST /api/checkout error:", err);
