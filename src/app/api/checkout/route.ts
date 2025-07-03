@@ -19,26 +19,34 @@ const PACKAGES: Package[] = [
 
 export async function POST(request: NextRequest) {
     try {
-        // Sólo esperamos bundleId
+        // 1. Leer bundleId del body
         const { bundleId } = (await request.json()) as { bundleId?: string };
         const pkg = PACKAGES.find((p) => p.id === bundleId);
         if (!pkg) {
             return NextResponse.json({ error: "Bundle inválido" }, { status: 400 });
         }
 
-        // Import dinámico del SDK de Mercado Pago
-        const mpModule = await import("mercadopago");
-        const mercadopago: any = mpModule.default ?? mpModule;
+        // 2. Importar SDK de Mercado Pago en runtime (Node)
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const mpPkg: any = require("mercadopago");
+        const mercadopago: any = mpPkg.default ?? mpPkg;
 
-        if (!process.env.MP_ACCESS_TOKEN || !process.env.NEXT_PUBLIC_BASE_URL) {
-            console.error("Variables de entorno de Mercado Pago faltantes");
+        // 3. Validaciones de entorno
+        if (!process.env.MP_ACCESS_TOKEN) {
+            console.error("MP_ACCESS_TOKEN no definido");
+            return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+        }
+        if (!process.env.NEXT_PUBLIC_BASE_URL) {
+            console.error("NEXT_PUBLIC_BASE_URL no definido");
             return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
         }
 
-        // Configuramos el SDK en runtime
-        mercadopago.configure({ access_token: process.env.MP_ACCESS_TOKEN });
+        // 4. Configurar SDK
+        mercadopago.configure({
+            access_token: process.env.MP_ACCESS_TOKEN,
+        });
 
-        // Creamos la preferencia usando sólo los datos del paquete
+        // 5. Crear preferencia de pago
         const preferenceResponse = await mercadopago.preferences.create({
             items: [
                 {
@@ -53,13 +61,12 @@ export async function POST(request: NextRequest) {
                 pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pending`,
             },
             auto_return: "approved",
-            metadata: { bundleId }, // opcional: rastrear paquete
+            // metadata: { bundle: pkg.id }  // si luego quieres recuperar el bundle en el webhook
         });
 
-        return NextResponse.json({
-            init_point: preferenceResponse.body.init_point,
-            id: preferenceResponse.body.id,
-        });
+        // 6. Devolver init_point
+        const init_point = preferenceResponse.body.init_point;
+        return NextResponse.json({ init_point });
     } catch (err: any) {
         console.error("POST /api/checkout error:", err);
         return NextResponse.json(
@@ -68,3 +75,4 @@ export async function POST(request: NextRequest) {
         );
     }
 }
+
