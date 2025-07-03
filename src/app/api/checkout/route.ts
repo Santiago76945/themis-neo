@@ -3,9 +3,7 @@
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyIdToken } from "@/lib/firebaseAdmin";      // <— autenticación
-import { connectToDatabase } from "@/lib/db";             // <— en caso de necesitar DB
-import User from "@/lib/models/User";                     // <— para emitir logs, opcional
+import { verifyIdToken } from "@/lib/firebaseAdmin";     
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 interface Package {
@@ -62,6 +60,9 @@ export async function POST(request: NextRequest) {
                 auto_return: "approved",
             },
         });
+
+        // 3.1) Loguear back_urls para verificar configuración
+        console.log("MP back_urls:", preferenceResponse.back_urls);
 
         // 4) Devolver init_point
         return NextResponse.json({ init_point: preferenceResponse.init_point });
