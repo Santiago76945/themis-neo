@@ -1,7 +1,9 @@
 // src/app/api/checkout/route.ts
 
 export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
+import { MercadoPagoConfig, Preference } from "mercadopago";
 
 interface Package {
     id: string;
@@ -16,6 +18,11 @@ const PACKAGES: Package[] = [
     { id: "premium", label: "1000 ThemiCoins", amount: 1000, price: 5999.00 },
 ];
 
+// Instanciamos el cliente solo una vez
+const mpClient = new MercadoPagoConfig({
+    accessToken: process.env.MP_ACCESS_TOKEN!,
+});
+
 export async function POST(request: NextRequest) {
     try {
         const { bundleId } = (await request.json()) as { bundleId?: string };
@@ -24,44 +31,30 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Bundle inválido" }, { status: 400 });
         }
 
-        // 1) Import dinámico de la SDK ESM
-        const mpModule: any = await import("mercadopago");
-        const mercadopago = mpModule.default ?? mpModule;
-
-        // 2) Validaciones de entorno
-        if (!process.env.MP_ACCESS_TOKEN) {
-            console.error("MP_ACCESS_TOKEN no definido");
-            return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
-        }
-        if (!process.env.NEXT_PUBLIC_BASE_URL) {
-            console.error("NEXT_PUBLIC_BASE_URL no definido");
-            return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
-        }
-
-        // 3) Ahora sí funciona configure()
-        mercadopago.configure({
-            access_token: process.env.MP_ACCESS_TOKEN,
-        });
-
-        // 4) Creación de la preferencia de pago
-        const preferenceResponse = await mercadopago.preferences.create({
-            items: [
-                {
-                    title: pkg.label,
-                    quantity: 1,
-                    unit_price: pkg.price,
+        // Creamos la preferencia usando la nueva clase Preference
+        const preferenceClient = new Preference(mpClient);
+        const preferenceResponse = await preferenceClient.create({
+            body: {
+                items: [
+                    {
+                        id: pkg.id,
+                        title: pkg.label,
+                        quantity: 1,
+                        unit_price: pkg.price,
+                    },
+                ],
+                back_urls: {
+                    success: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
+                    failure: `${process.env.NEXT_PUBLIC_BASE_URL}/failure`,
+                    pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pending`,
                 },
-            ],
-            back_urls: {
-                success: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-                failure: `${process.env.NEXT_PUBLIC_BASE_URL}/failure`,
-                pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pending`,
+                auto_return: "approved",
             },
-            auto_return: "approved",
         });
 
-        // 5) Devolver init_point al cliente
-        return NextResponse.json({ init_point: preferenceResponse.body.init_point });
+        // En v2, `create()` devuelve ya el objeto con init_point, no dentro de .body
+        const init_point = preferenceResponse.init_point;
+        return NextResponse.json({ init_point });
     } catch (err: any) {
         console.error("POST /api/checkout error:", err);
         return NextResponse.json(
@@ -70,4 +63,3 @@ export async function POST(request: NextRequest) {
         );
     }
 }
-
