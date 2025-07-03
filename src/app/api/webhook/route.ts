@@ -8,49 +8,46 @@ import User from "@/lib/models/User";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mercadopago: any = require("mercadopago");
 
-// Configurar Mercado Pago al cargar el módulo
-if (!process.env.MP_ACCESS_TOKEN) {
-    throw new Error("MP_ACCESS_TOKEN must be defined in environment variables");
-}
-mercadopago.configure({
-    access_token: process.env.MP_ACCESS_TOKEN,
-});
-
-// Mapa de crédito según bundleId
-const CREDIT_MAP: Record<string, number> = {
-    basic: 100,
-    popular: 500,
-    premium: 1000,
-};
-
 export async function POST(req: NextRequest) {
-    // Validar secreto del webhook
-    const receivedSecret = req.headers.get("x-secret-token");
-    if (receivedSecret !== process.env.MP_WEBHOOK_SECRET) {
-        console.error("Webhook secret mismatch", receivedSecret);
+    // 1) Validar variables de entorno
+    if (!process.env.MP_ACCESS_TOKEN || !process.env.MP_WEBHOOK_SECRET) {
+        console.error("Missing MP_* env vars");
+        return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+    }
+    // Configurar SDK
+    mercadopago.configure({ access_token: process.env.MP_ACCESS_TOKEN });
+
+    // 2) Verificar secreto del webhook
+    const received = req.headers.get("x-secret-token");
+    if (received !== process.env.MP_WEBHOOK_SECRET) {
+        console.error("Webhook: secret mismatch", received);
         return new NextResponse(null, { status: 401 });
     }
 
-    // Parsear payload JSON
+    // 3) Parsear payload JSON (MP envía el evento en el body)
     const body = await req.json();
     const topic = body.type || body.topic;
     const id = body.data?.id || body.id;
-    const metadata = body.data?.metadata;
 
-    if (topic === "payment" && id && metadata?.uid && metadata?.bundleId) {
+    if (topic === "payment" && id) {
         try {
-            console.log("🔔 Webhook received:", { topic, id, metadata });
-
+            console.log("🔔 Webhook recibido:", { topic, id, metadata: body.data?.metadata });
             // Obtener detalle del pago
             const paymentResponse = await mercadopago.payment.get(Number(id));
             const payment = paymentResponse.body;
 
             if (payment.status === "approved") {
-                const { uid, bundleId } = metadata;
-                const credit = CREDIT_MAP[bundleId as string] || 0;
+                // 4) Extraer metadata alineada con checkout
+                const { uid, bundleId } = payment.metadata || {};
+                const creditMap: Record<string, number> = {
+                    basic: 100,
+                    popular: 500,
+                    premium: 1000,
+                };
+                const credit = creditMap[bundleId as string] || 0;
 
-                if (credit > 0) {
-                    // Conectar a BD y acreditar monedas
+                if (uid && credit > 0) {
+                    // 5) Conectar a BD y acreditar monedas
                     await connectToDatabase();
                     const user = await User.findOneAndUpdate(
                         { uid },
@@ -58,20 +55,20 @@ export async function POST(req: NextRequest) {
                         { new: true }
                     );
                     console.log(
-                        `✅ Credited ${credit} ThemiCoins to uid=${uid}. New balance:`,
+                        `✅ Acreditadas ${credit} ThemiCoins a uid=${uid}. Nuevo saldo:`,
                         user?.coinsBalance
                     );
                 } else {
-                    console.warn("Unknown bundleId or zero credit:", bundleId);
+                    console.warn("Webhook: metadata incompleta", payment.metadata);
                 }
             } else {
-                console.log("Payment not approved:", payment.status);
+                console.log("Payment status no approved:", payment.status);
             }
-        } catch (error: any) {
-            console.error("❌ Error processing webhook:", error);
+        } catch (e) {
+            console.error("❌ Error verificando/acreditando pago:", e);
         }
     }
 
-    // Responder siempre 200 para Mercado Pago
+    // 6) Responder siempre 200 para MP
     return NextResponse.json({ received: true });
 }
