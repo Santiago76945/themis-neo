@@ -1,21 +1,21 @@
 // src/app/api/transcriptions/[id]/route.ts
 
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import Transcription from "@/lib/models/Transcription";
 import { verifyIdToken } from "@/lib/firebaseAdmin";
 
 export async function DELETE(
-    request: NextRequest,
+    request: Request,
     { params }: { params: { id: string } }
 ) {
     try {
-        // 1. Autenticación
+        // Autenticación
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid: userUid } = await verifyIdToken(idToken);
 
-        // 2. Conexión y borrado
+        // Conexión y borrado
         await connectToDatabase();
         const doc = await Transcription.findOneAndDelete({
             _id: params.id,
