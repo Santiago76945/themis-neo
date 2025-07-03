@@ -37,9 +37,12 @@ export default function AudioTranscriptionPage() {
     const [transcripts, setTranscripts] = useState<Transcription[]>([]);
     const [isModalOpen, setModalOpen] = useState(false);
 
-    const COINS_PER_TOKEN = parseFloat(
-        process.env.NEXT_PUBLIC_COINS_PER_TOKEN || "0"
-    );
+    // Refresca saldo al montarse y cuando cambia usuario
+    useEffect(() => {
+        if (user) {
+            refreshCoins();
+        }
+    }, [user, refreshCoins]);
 
     // Carga inicial de transcripciones
     useEffect(() => {
@@ -57,13 +60,39 @@ export default function AudioTranscriptionPage() {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setError("");
-        setFile(e.target.files?.[0] ?? null);
+        if (coinsBalance <= 0) {
+            setError("Saldo insuficiente. Compra ThemiCoins para subir archivos.");
+            setFile(null);
+            setModalOpen(true);
+            return;
+        }
+        const f = e.target.files?.[0] ?? null;
+        if (f) {
+            const maxSizeMB = 25;
+            const allowedExt = /\.(mp3|wav|m4a)$/i;
+            if (f.size > maxSizeMB * 1024 * 1024) {
+                setError(`Archivo demasiado grande. Máximo ${maxSizeMB} MB.`);
+                setFile(null);
+                return;
+            }
+            if (!allowedExt.test(f.name)) {
+                setError("Formato no soportado. Usa mp3, wav o m4a.");
+                setFile(null);
+                return;
+            }
+        }
+        setFile(f);
     };
 
     const handleTranscribe = async () => {
         setError("");
+        if (coinsBalance <= 0) {
+            setError("Saldo insuficiente. Compra ThemiCoins para transcribir.");
+            setModalOpen(true);
+            return;
+        }
         if (!file) {
-            setError("Por favor, sube un archivo primero.");
+            setError("Debes seleccionar un archivo de audio válido.");
             return;
         }
         if (!title.trim()) {
@@ -77,18 +106,11 @@ export default function AudioTranscriptionPage() {
 
         setIsProcessing(true);
         try {
-            // 1. Subir el audio a Firebase Storage
             const fileUrl = await uploadAudioFile(file, user.uid);
-
-            // 2. Crear transcripción vía apiClient
             const created: Transcription = await postTranscription({ title, fileUrl });
             setTranscripts((prev) => [created, ...prev]);
-
-            // Limpiar inputs
             setFile(null);
             setTitle("");
-
-            // Refrescar balance tras la transcripción
             await refreshCoins();
         } catch (err: any) {
             console.error("Transcribir:", err);
@@ -125,13 +147,11 @@ export default function AudioTranscriptionPage() {
 
     return (
         <div className={`container ${styles.pageContainer}`}>
-            {/* Modal de compra de ThemiCoins */}
             <CoinPurchaseModal
                 visible={isModalOpen}
                 onClose={() => setModalOpen(false)}
                 onPurchase={async (amount: number) => {
-                    // Aquí llamarías a tu API de /api/coins para añadir coins
-                    await refreshCoins(); // refresca balance tras compra
+                    await refreshCoins();
                     setModalOpen(false);
                 }}
             />
@@ -173,36 +193,34 @@ export default function AudioTranscriptionPage() {
                             <input
                                 type="file"
                                 id="audioUpload"
-                                accept="audio/*"
+                                accept=".mp3,.wav,.m4a"
                                 onChange={handleFileChange}
-                                disabled={isProcessing}
+                                disabled={isProcessing || coinsBalance <= 0}
                             />
                             <label
                                 htmlFor="audioUpload"
                                 className={`btn ${styles.actionButton}`}
+                                onClick={() => coinsBalance <= 0 && setModalOpen(true)}
                             >
                                 📂 Subir archivo
                             </label>
                             {file && <span className={styles.fileInfo}>{file.name}</span>}
                             <small className={styles.fileInfo}>
-                                Formatos: mp3, wav, m4a. Máx 25 MB.
+                                Formatos permitidos: mp3, wav, m4a — hasta 25 MB.
                             </small>
                         </div>
                         <input
                             type="text"
                             placeholder="Título de la transcripción"
                             value={title}
-                            onChange={(e) => {
-                                setTitle(e.target.value);
-                                setError("");
-                            }}
+                            onChange={(e) => { setTitle(e.target.value); setError(""); }}
                             className="input"
                             disabled={isProcessing}
                         />
                         <button
                             className={`btn ${styles.actionButton}`}
                             onClick={handleTranscribe}
-                            disabled={isProcessing}
+                            disabled={isProcessing || coinsBalance <= 0}
                         >
                             {isProcessing ? "Procesando..." : "Iniciar transcripción"}
                         </button>
@@ -243,20 +261,14 @@ export default function AudioTranscriptionPage() {
                                     <div className={styles.listItemActions}>
                                         <button
                                             className={`btn ${styles.actionButton}`}
-                                            onClick={() =>
-                                                router.push(
-                                                    `/menu/audio-transcription/${t._id}`
-                                                )
-                                            }
+                                            onClick={() => router.push(`/menu/audio-transcription/${t._id}`)}
                                             disabled={isProcessing}
                                         >
                                             Ver
                                         </button>
                                         <button
                                             className={`btn ${styles.actionButton}`}
-                                            onClick={() =>
-                                                navigator.clipboard.writeText(t.text)
-                                            }
+                                            onClick={() => navigator.clipboard.writeText(t.text)}
                                             disabled={isProcessing}
                                         >
                                             Copiar

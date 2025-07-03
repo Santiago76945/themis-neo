@@ -2,30 +2,31 @@
 
 import * as admin from "firebase-admin";
 
+// Variables de entorno
+const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+const storageBucketName = process.env.FIREBASE_STORAGE_BUCKET; // debe ser "themis-971b4.appspot.com"
+
+if (!serviceAccountJson) {
+    throw new Error(
+        "FIREBASE_SERVICE_ACCOUNT debe estar definido en las variables de entorno"
+    );
+}
+if (!storageBucketName) {
+    throw new Error(
+        "FIREBASE_STORAGE_BUCKET debe estar definido en las variables de entorno"
+    );
+}
+
 // Inicializa una única instancia del Admin SDK de Firebase
 if (!admin.apps.length) {
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-    const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-
-    if (!serviceAccount) {
-        throw new Error(
-            "FIREBASE_SERVICE_ACCOUNT must be defined in environment variables"
-        );
-    }
-    if (!storageBucket) {
-        throw new Error(
-            "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET must be defined in environment variables"
-        );
-    }
-
     admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(serviceAccount)),
-        storageBucket, // configura el bucket por defecto
+        credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
+        storageBucket: storageBucketName,
     });
 }
 
-// `adminStorage` es YA un objeto `Bucket`
-export const adminStorage = admin.storage().bucket();
+// `adminStorage` es un objeto `Bucket` para operaciones con archivos
+export const adminStorage = admin.storage().bucket(storageBucketName);
 
 /**
  * Verifica un ID token de Firebase, devolviendo el payload decodificado.

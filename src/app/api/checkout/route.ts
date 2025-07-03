@@ -1,7 +1,7 @@
 // src/app/api/checkout/route.ts
 
 import { NextResponse } from "next/server";
-import { createPreference } from "@/lib/mercadoPago";
+import { createPreference } from "@/server/mercadoPago";
 
 interface Package {
     id: string;

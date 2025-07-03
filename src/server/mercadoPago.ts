@@ -1,4 +1,4 @@
-// src/lib/mercadoPago.ts
+// src/server/mercadoPago.ts
 
 // Importamos con require para evitar restricciones de tipo en TS
 const mercadopago = require("mercadopago");

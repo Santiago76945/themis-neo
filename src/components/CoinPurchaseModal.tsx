@@ -6,7 +6,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Popup from "./Popup";
 import styles from "@/components/styles/CoinPurchaseModal.module.css";
-import { createPreference } from "@/lib/mercadoPago";
+import { createCheckoutPreference } from "@/lib/apiClient";
 
 interface Package {
     id: string;
@@ -38,16 +38,14 @@ export default function CoinPurchaseModal({
 
     const handleBuy = async (pkg: Package) => {
         try {
-            // Create Mercado Pago preference on the backend
-            const { body } = await createPreference([
+            const { init_point } = await createCheckoutPreference([
                 {
                     title: pkg.label,
                     quantity: 1,
                     unit_price: Number(pkg.price.replace(/[^0-9.-]+/g, "")),
                 },
             ]);
-            // Redirect user to Mercado Pago checkout
-            window.location.href = body.init_point;
+            window.location.href = init_point;
         } catch (err: any) {
             console.error("Error al iniciar checkout:", err);
             alert("No se pudo iniciar la compra. Intenta de nuevo.");
@@ -77,7 +75,6 @@ export default function CoinPurchaseModal({
                         >
                             Obtener
                         </button>
-                        {/* Logo de Mercado Pago */}
                         <img
                             src="/images/mercadopago.svg"
                             alt="Mercado Pago Logo"

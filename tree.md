@@ -80,3 +80,6 @@ THEMIS-NEO
 ├─ next.config.ts
 ├─ package.json
 └─ README.md
+
+finalmente mercadoPago.ts fue movido a src/server porque sino
+El error te está saltando porque src/lib/mercadoPago.ts se importa en un contexto de cliente (tu bundle de React), y ahí no existen las variables de entorno ni el SDK de MercadoPago. 

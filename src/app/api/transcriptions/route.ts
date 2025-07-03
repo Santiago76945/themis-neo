@@ -5,21 +5,7 @@ import { connectToDatabase } from "@/lib/db";
 import Transcription from "@/lib/models/Transcription";
 import { verifyIdToken, adminStorage } from "@/lib/firebaseAdmin";
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
-const COINS_PER_TOKEN = parseFloat(process.env.COINS_PER_TOKEN || "0");
-const COINS_PER_MB = parseFloat(process.env.COINS_PER_MB || "0");
-
-if (!OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY must be defined");
-}
-
-/**
- * Extrae la ruta interna de storage a partir de un download URL de Firebase.
- * Por ejemplo convierte
- *   https://firebasestorage.googleapis.com/v0/b/mi-bucket/o/audios%2Fuid%2Ffile.m4a?...
- * en
- *   "audios/uid/file.m4a"
- */
+// Extrae la ruta interna de storage a partir de un download URL de Firebase.
 function extractStoragePathFromUrl(url: string): string {
     const afterO = url.split("/o/")[1] || "";
     const [encodedPath] = afterO.split("?");
@@ -27,13 +13,19 @@ function extractStoragePathFromUrl(url: string): string {
 }
 
 export async function POST(request: Request) {
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    if (!OPENAI_API_KEY) {
+        return NextResponse.json(
+            { error: "OPENAI_API_KEY must be defined" },
+            { status: 500 }
+        );
+    }
+
     try {
-        // 1. Autenticación
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid: userUid } = await verifyIdToken(idToken);
 
-        // 2. Parsear entrada
         const { title, fileUrl } = await request.json();
         if (typeof title !== "string" || typeof fileUrl !== "string") {
             return NextResponse.json(
@@ -42,40 +34,30 @@ export async function POST(request: Request) {
             );
         }
 
-        // 3. Descargar audio
         const audioRes = await fetch(fileUrl);
         if (!audioRes.ok) {
             throw new Error(`No se pudo descargar audio: ${audioRes.statusText}`);
         }
         const arrayBuffer = await audioRes.arrayBuffer();
+        const fileSizeMB = arrayBuffer.byteLength / (1024 * 1024);
 
-        // 3.1 Calcular tamaño en MB
-        const fileSizeBytes = arrayBuffer.byteLength;
-        const fileSizeMB = fileSizeBytes / (1024 * 1024);
-
-        // 4. Construir File para Whisper
-        const urlParts = fileUrl.split("/");
-        let fileName = urlParts[urlParts.length - 1] || "audio.m4a";
-        fileName = fileName.split("?")[0];
-        const mimeType = fileName.toLowerCase().endsWith(".m4a")
-            ? "audio/m4a"
-            : fileName.endsWith(".mp3")
-                ? "audio/mpeg"
-                : "";
-
+        const fileName = fileUrl.split('/').pop()?.split('?')[0] || 'audio';
+        const mimeType = fileName.toLowerCase().endsWith('.mp3')
+            ? 'audio/mpeg'
+            : fileName.toLowerCase().endsWith('.m4a')
+                ? 'audio/m4a'
+                : '';
         const file = new File(
             [arrayBuffer],
             fileName,
             mimeType ? { type: mimeType } : undefined
         );
 
-        // 5. Preparar FormData
         const formData = new FormData();
         formData.append("file", file);
         formData.append("model", "whisper-1");
         formData.append("response_format", "text");
 
-        // 6. Llamada a OpenAI Whisper
         const aiRes = await fetch(
             "https://api.openai.com/v1/audio/transcriptions",
             {
@@ -90,59 +72,52 @@ export async function POST(request: Request) {
         }
         const text = await aiRes.text();
 
-        // 7. Contar tokens y calcular coste
-        const tokens = text.split(/\s+/).filter(Boolean).length;
-        const tokenCost = Math.ceil(tokens * COINS_PER_TOKEN);
-        const sizeCost = Math.ceil(fileSizeMB * COINS_PER_MB);
-        const coinsCost = tokenCost + sizeCost;
-
-        // 8. Guardar en MongoDB
         await connectToDatabase();
-        const doc = await Transcription.create({
-            userUid,
-            title,
-            fileUrl,
-            text,
-            tokens,
-            coinsCost,
-            // opcional: si tu esquema lo soporta, podrías guardar también fileSizeBytes y sizeCost
-        });
 
-        // 9. Eliminar el audio del bucket de Firebase
+        const tokens = text.split(/\s+/).filter(Boolean).length;
+        const COINS_PER_TOKEN = parseFloat(process.env.COINS_PER_TOKEN || '0');
+        const COINS_PER_MB = parseFloat(process.env.COINS_PER_MB || '0');
+        const coinsCost = Math.ceil(tokens * COINS_PER_TOKEN + fileSizeMB * COINS_PER_MB);
+
+        const session = await (await import('mongoose')).startSession();
+        await session.startTransaction();
+        const { default: User } = await import('@/lib/models/User');
+        const usr = await User.findOneAndUpdate(
+            { uid: userUid, coinsBalance: { $gte: coinsCost } },
+            { $inc: { coinsBalance: -coinsCost } },
+            { session, new: true }
+        );
+        if (!usr) {
+            await session.abortTransaction();
+            return NextResponse.json({ error: 'Saldo insuficiente' }, { status: 402 });
+        }
+        await session.commitTransaction();
+
+        const doc = await Transcription.create({ userUid, title, fileUrl, text, tokens, coinsCost });
+
         try {
             const storagePath = extractStoragePathFromUrl(fileUrl);
             await adminStorage.file(storagePath).delete();
-        } catch (firebaseErr) {
-            console.error("Error al borrar audio del bucket:", firebaseErr);
-            // No interrumpimos la respuesta: la transcripción ya está guardada.
-        }
+        } catch { }
 
         return NextResponse.json(doc, { status: 201 });
     } catch (err: any) {
         console.error("POST /api/transcriptions error:", err);
-        return NextResponse.json(
-            { error: err.message || "Error interno" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: err.message || "Error interno" }, { status: 500 });
     }
 }
 
 export async function GET(request: Request) {
     try {
-        // 1. Autenticación
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid: userUid } = await verifyIdToken(idToken);
 
-        // 2. Leer transcripciones del usuario
         await connectToDatabase();
         const all = await Transcription.find({ userUid }).sort({ createdAt: -1 });
         return NextResponse.json(all);
     } catch (err: any) {
         console.error("GET /api/transcriptions error:", err);
-        return NextResponse.json(
-            { error: err.message || "Error interno" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: err.message || "Error interno" }, { status: 500 });
     }
 }
