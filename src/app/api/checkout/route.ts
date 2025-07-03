@@ -19,6 +19,7 @@ const PACKAGES: Package[] = [
 
 export async function POST(request: NextRequest) {
     try {
+        // Sólo esperamos bundleId
         const { bundleId } = (await request.json()) as { bundleId?: string };
         const pkg = PACKAGES.find((p) => p.id === bundleId);
         if (!pkg) {
@@ -27,24 +28,17 @@ export async function POST(request: NextRequest) {
 
         // Import dinámico del SDK de Mercado Pago
         const mpModule = await import("mercadopago");
-        // Forzamos a any para esquivar errores de TS sobre configure/preferences
         const mercadopago: any = mpModule.default ?? mpModule;
 
-        if (!process.env.MP_ACCESS_TOKEN) {
-            console.error("MP_ACCESS_TOKEN no definido");
-            return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
-        }
-        if (!process.env.NEXT_PUBLIC_BASE_URL) {
-            console.error("NEXT_PUBLIC_BASE_URL no definido");
+        if (!process.env.MP_ACCESS_TOKEN || !process.env.NEXT_PUBLIC_BASE_URL) {
+            console.error("Variables de entorno de Mercado Pago faltantes");
             return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
         }
 
         // Configuramos el SDK en runtime
-        mercadopago.configure({
-            access_token: process.env.MP_ACCESS_TOKEN,
-        });
+        mercadopago.configure({ access_token: process.env.MP_ACCESS_TOKEN });
 
-        // Creamos la preferencia
+        // Creamos la preferencia usando sólo los datos del paquete
         const preferenceResponse = await mercadopago.preferences.create({
             items: [
                 {
@@ -59,10 +53,13 @@ export async function POST(request: NextRequest) {
                 pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pending`,
             },
             auto_return: "approved",
+            metadata: { bundleId }, // opcional: rastrear paquete
         });
 
-        const init_point = preferenceResponse.body.init_point;
-        return NextResponse.json({ init_point });
+        return NextResponse.json({
+            init_point: preferenceResponse.body.init_point,
+            id: preferenceResponse.body.id,
+        });
     } catch (err: any) {
         console.error("POST /api/checkout error:", err);
         return NextResponse.json(

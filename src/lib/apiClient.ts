@@ -3,7 +3,7 @@
 import { getAuth } from "firebase/auth";
 import { app } from "@/lib/firebase";
 
-// Helper to include Firebase ID token in requests
+// Helper para incluir el ID token de Firebase
 async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) {
     const auth = getAuth(app);
     const user = auth.currentUser;
@@ -51,22 +51,16 @@ export const purchaseCoins = (amount: number): Promise<CoinsBalance> =>
         body: JSON.stringify({ amount }),
     });
 
-// Checkout de Mercado Pago
-export interface CheckoutItem {
-    title: string;
-    quantity: number;
-    unit_price: number;
-}
-
+// Checkout de Mercado Pago (ahora sólo bundleId)
 export interface CheckoutPreference {
     init_point: string;
     id: string;
 }
 
 export const createCheckoutPreference = (
-    items: CheckoutItem[]
+    bundleId: string
 ): Promise<CheckoutPreference> =>
     fetchWithAuth("/api/checkout", {
         method: "POST",
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ bundleId }),
     });

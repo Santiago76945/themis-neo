@@ -3,7 +3,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import Popup from "./Popup";
 import styles from "@/components/styles/CoinPurchaseModal.module.css";
 import { createCheckoutPreference } from "@/lib/apiClient";
@@ -34,25 +33,19 @@ export default function CoinPurchaseModal({
     onClose,
     onPurchase,
 }: CoinPurchaseModalProps) {
-    const router = useRouter();
+    if (!visible) return null;
 
     const handleBuy = async (pkg: Package) => {
         try {
-            const { init_point } = await createCheckoutPreference([
-                {
-                    title: pkg.label,
-                    quantity: 1,
-                    unit_price: Number(pkg.price.replace(/[^0-9.-]+/g, "")),
-                },
-            ]);
+            // Ahora enviamos sólo el bundleId al backend
+            const { init_point } = await createCheckoutPreference(pkg.id);
+            // Redirigimos al checkout de Mercado Pago
             window.location.href = init_point;
         } catch (err: any) {
             console.error("Error al iniciar checkout:", err);
             alert("No se pudo iniciar la compra. Intenta de nuevo.");
         }
     };
-
-    if (!visible) return null;
 
     return (
         <Popup isOpen={visible} onClose={onClose} width="800px" zIndex={2000}>
@@ -86,9 +79,8 @@ export default function CoinPurchaseModal({
 
             <div className={styles.coinExplanation}>
                 ¿Tienes grabaciones de audio —una llamada clave con un cliente o la reunión
-                de tu equipo capturada en tu app de notas de voz?
-                Con <strong>Themis AI</strong> convierte esos archivos en texto en segundos,
-                ¡como por arte de magia!
+                de tu equipo capturada en tu app de notas de voz? Con <strong>Themis AI</strong>{" "}
+                convierte esos archivos en texto en segundos, ¡como por arte de magia!
             </div>
 
             <div className={styles.coinFooter}>
