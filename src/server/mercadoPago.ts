@@ -1,31 +1,30 @@
 // src/server/mercadoPago.ts
 
-// 1) Requerimos el módulo y, si viene como namespace, tomamos `.default`
-const mpPkg: any = require("mercadopago");
-const mercadopago: any = mpPkg.default ?? mpPkg;
+import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
+// 1) Verificamos vars de entorno
 if (!process.env.MP_ACCESS_TOKEN) {
-    throw new Error("MP_ACCESS_TOKEN must be defined in environment variables");
+    throw new Error("MP_ACCESS_TOKEN must be defined");
 }
 if (!process.env.NEXT_PUBLIC_BASE_URL) {
-    throw new Error("NEXT_PUBLIC_BASE_URL must be defined in environment variables");
+    throw new Error("NEXT_PUBLIC_BASE_URL must be defined");
 }
 
-// 2) Ahora sí configure existe
-mercadopago.configure({
-    access_token: process.env.MP_ACCESS_TOKEN,
+// 2) Instanciamos el SDK
+const mpClient = new MercadoPagoConfig({
+    accessToken: process.env.MP_ACCESS_TOKEN!,
 });
 
-export async function createPreference(
-    items: { title: string; quantity: number; unit_price: number }[]
-) {
-    return mercadopago.preferences.create({
-        items,
-        back_urls: {
-            success: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-            failure: `${process.env.NEXT_PUBLIC_BASE_URL}/failure`,
-            pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pending`,
-        },
-        auto_return: "approved",
-    });
+// 3) Creamos los clientes
+export const preferenceClient = new Preference(mpClient);
+export const paymentClient = new Payment(mpClient);
+
+/**
+ * Crea una preferencia y devuelve el resultado de MP
+ */
+export async function createPreference(data: any): Promise<any> {
+    // Forzamos any para evitar chequeos de tipos en TS
+    const mpRes: any = await preferenceClient.create({ body: data });
+    // Devuelve el objeto entero (contiene init_point)
+    return mpRes;
 }

@@ -5,17 +5,17 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import User from "@/lib/models/User";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mercadopago: any = require("mercadopago");
+import { paymentClient } from "@/server/mercadoPago";
 
 export async function POST(req: NextRequest) {
     // 1) Validar variables de entorno
     if (!process.env.MP_ACCESS_TOKEN || !process.env.MP_WEBHOOK_SECRET) {
         console.error("Missing MP_* env vars");
-        return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+        return NextResponse.json(
+            { error: "Server misconfigured" },
+            { status: 500 }
+        );
     }
-    // Configurar SDK
-    mercadopago.configure({ access_token: process.env.MP_ACCESS_TOKEN });
 
     // 2) Verificar secreto del webhook
     const received = req.headers.get("x-secret-token");
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         return new NextResponse(null, { status: 401 });
     }
 
-    // 3) Parsear payload JSON (MP envía el evento en el body)
+    // 3) Parsear payload
     const body = await req.json();
     const topic = body.type || body.topic;
     const id = body.data?.id || body.id;
@@ -32,22 +32,20 @@ export async function POST(req: NextRequest) {
     if (topic === "payment" && id) {
         try {
             console.log("🔔 Webhook recibido:", { topic, id, metadata: body.data?.metadata });
-            // Obtener detalle del pago
-            const paymentResponse = await mercadopago.payment.get(Number(id));
-            const payment = paymentResponse.body;
+
+            // 4) Obtener detalle del pago usando el SDK nuevo
+            // Forzamos any para saltear chequeo de tipos en TS
+            const mpRes: any = await (paymentClient as any).get(Number(id));
+            const payment = mpRes.body ?? mpRes;
 
             if (payment.status === "approved") {
-                // 4) Extraer metadata alineada con checkout
+                // 5) Extraer metadata y calcular crédito
                 const { uid, bundleId } = payment.metadata || {};
-                const creditMap: Record<string, number> = {
-                    basic: 100,
-                    popular: 500,
-                    premium: 1000,
-                };
+                const creditMap: Record<string, number> = { basic: 100, popular: 500, premium: 1000 };
                 const credit = creditMap[bundleId as string] || 0;
 
                 if (uid && credit > 0) {
-                    // 5) Conectar a BD y acreditar monedas
+                    // 6) Conectar a DB y acreditar monedas
                     await connectToDatabase();
                     const user = await User.findOneAndUpdate(
                         { uid },
@@ -62,13 +60,13 @@ export async function POST(req: NextRequest) {
                     console.warn("Webhook: metadata incompleta", payment.metadata);
                 }
             } else {
-                console.log("Payment status no approved:", payment.status);
+                console.log("Payment status not approved:", payment.status);
             }
         } catch (e) {
             console.error("❌ Error verificando/acreditando pago:", e);
         }
     }
 
-    // 6) Responder siempre 200 para MP
+    // 7) Responder siempre 200 para MP
     return NextResponse.json({ received: true });
 }
