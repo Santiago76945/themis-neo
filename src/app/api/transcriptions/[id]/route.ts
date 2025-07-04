@@ -5,7 +5,10 @@ import { connectToDatabase } from "@/lib/db";
 import Transcription from "@/lib/models/Transcription";
 import { verifyIdToken } from "@/lib/firebaseAdmin";
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(
+    request: NextRequest,
+    context: { params: { id: string } }
+): Promise<NextResponse> {
     const { id } = context.params;
     try {
         // Autenticación
@@ -17,7 +20,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
         await connectToDatabase();
         const doc = await Transcription.findOne(
             { _id: id, userUid },
-            { text: 1, title: 1, createdAt: 1 }  // sólo devolver los campos relevantes
+            { text: 1, title: 1, createdAt: 1 } // solo campos relevantes
         );
         if (!doc) {
             return NextResponse.json(
@@ -26,11 +29,10 @@ export async function GET(request: NextRequest, context: { params: { id: string 
             );
         }
 
-        return NextResponse.json({
-            title: doc.title,
-            text: doc.text,
-            createdAt: doc.createdAt
-        }, { status: 200 });
+        return NextResponse.json(
+            { title: doc.title, text: doc.text, createdAt: doc.createdAt },
+            { status: 200 }
+        );
     } catch (err: any) {
         console.error("GET /api/transcriptions/[id] error:", err);
         return NextResponse.json(
@@ -40,7 +42,10 @@ export async function GET(request: NextRequest, context: { params: { id: string 
     }
 }
 
-export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(
+    request: NextRequest,
+    context: { params: { id: string } }
+): Promise<NextResponse> {
     const { id } = context.params;
     try {
         // Autenticación
@@ -71,3 +76,4 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
         );
     }
 }
+
