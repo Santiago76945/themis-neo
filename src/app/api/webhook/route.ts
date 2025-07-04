@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     const id = Number(resourceId);
     if (topic === "payment" && id) {
         try {
-            console.log("🔔 Webhook recibido:", { topic, id, metadata: body.data?.metadata });
+            console.log("🔔 Webhook recibido:", { topic, id });
 
             // Llamada corregida al SDK: usar { id } en vez de { payment_id }
             const mpRes: any = await paymentClient.get({ id });
@@ -86,13 +86,14 @@ export async function POST(req: NextRequest) {
             console.log("Detalle pago:", payment);
 
             if (payment.status === "approved") {
-                const { uid, bundleId } = payment.metadata || {};
+                // Extraer uid y bundle_id (snake_case) de la metadata
+                const { uid, bundle_id } = payment.metadata || {};
                 const creditMap: Record<string, number> = {
                     basic: 100,
                     popular: 500,
                     premium: 1000,
                 };
-                const credit = creditMap[String(bundleId)] || 0;
+                const credit = creditMap[String(bundle_id)] || 0;
 
                 if (uid && credit > 0) {
                     await connectToDatabase();
