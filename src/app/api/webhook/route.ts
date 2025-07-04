@@ -3,118 +3,62 @@
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "node:crypto";
-
 import { connectToDatabase } from "@/lib/db";
 import User from "@/lib/models/User";
 import { paymentClient } from "@/server/mercadoPago";
 
-/* ---------- Tipos auxiliares ---------- */
-interface MercadoPagoPayment {
-    status: string;
-    metadata?: {
-        uid?: string;
-        bundleId?: "basic" | "popular" | "premium";
-        [key: string]: unknown;
-    };
-    [key: string]: unknown;
-}
-
-/* ---------- Helpers ---------- */
-function verifyMpSignature(
-    signatureHeader: string | null,
-    paymentId: string,
-    secret: string,
-    requestId: string | null
-): boolean {
-    if (!signatureHeader) return false;
-
-    // x-signature: ts=...,v1=...
-    const parts = Object.fromEntries(
-        signatureHeader.split(",").map((p) => {
-            const [k, v] = p.trim().split("=");
-            return [k, v];
-        })
-    ) as Record<string, string>;
-
-    const ts = parts.ts;
-    const v1 = parts.v1;
-    if (!ts || !v1) return false;
-
-    // Cadena que Mercado Pago firma
-    const manifest = `id:${paymentId};request-id:${requestId ?? ""};ts:${ts};`;
-
-    const expected = crypto
-        .createHmac("sha256", secret)
-        .update(manifest)
-        .digest("hex");
-
-    // timing-safe compare
-    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(v1));
-}
-
-/* ---------- Handler ---------- */
+/**
+ * Handler de webhook MP:
+ * - Verifica cabecera x-secret-token
+ * - Consulta pago
+ * - Acredita monedas según metadata
+ */
 export async function POST(req: NextRequest) {
-    /* 1) Validar env vars */
+    // 1) Validar env vars
     if (!process.env.MP_ACCESS_TOKEN || !process.env.MP_WEBHOOK_SECRET) {
         console.error("Missing MP_* env vars");
-        return NextResponse.json(
-            { error: "Server misconfigured" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
     }
 
-    /* 2) Parsear body */
-    const body = await req.json();
-    const topic = body.type || body.topic;
-    const id = String(body.data?.id || body.id || "");
-    if (!id) return NextResponse.json({ received: true });
-
-    /* 3) Verificar firma */
-    const signature =
-        req.headers.get("x-signature") ??
-        req.headers.get("x-mercadopago-signature");
-    const requestId = req.headers.get("x-request-id");
-
-    if (
-        !verifyMpSignature(
-            signature,
-            id,
-            process.env.MP_WEBHOOK_SECRET,
-            requestId
-        )
-    ) {
-        console.error("Webhook: invalid signature", signature);
+    // 2) Verificar secreto del webhook
+    const received = req.headers.get("x-secret-token");
+    if (received !== process.env.MP_WEBHOOK_SECRET) {
+        console.error("Webhook: secret mismatch", received);
         return new NextResponse(null, { status: 401 });
     }
 
-    /* 4) Procesar pagos aprobados */
-    if (topic === "payment") {
+    // 3) Parsear payload
+    const body = await req.json();
+    const topic = body.type || body.topic;
+    const id = body.data?.id || body.id;
+
+    if (topic === "payment" && id) {
         try {
-            // evitamos genéricos para que TS no marque error
+            console.log("🔔 Webhook recibido:", { topic, id, metadata: body.data?.metadata });
+
+            // 4) Obtener detalle del pago
             const mpRes: any = await (paymentClient as any).get(Number(id));
-            const payment: MercadoPagoPayment =
-                mpRes.body ?? mpRes;
+            const payment = mpRes.body ?? mpRes;
 
             if (payment.status === "approved") {
-                const { uid, bundleId } = payment.metadata ?? {};
-                const creditMap = { basic: 100, popular: 500, premium: 1000 } as const;
-                const credit =
-                    bundleId && bundleId in creditMap
-                        ? creditMap[bundleId as keyof typeof creditMap]
-                        : 0;
+                // 5) Extraer metadata y calcular crédito
+                const { uid, bundleId } = payment.metadata || {};
+                const creditMap: Record<string, number> = {
+                    basic: 100,
+                    popular: 500,
+                    premium: 1000,
+                };
+                const credit = creditMap[String(bundleId)] || 0;
 
                 if (uid && credit > 0) {
+                    // 6) Conectar a DB y acreditar monedas
                     await connectToDatabase();
                     const user = await User.findOneAndUpdate(
                         { uid },
                         { $inc: { coinsBalance: credit } },
                         { new: true }
                     );
-                    console.log(
-                        `✅ Acreditadas ${credit} ThemiCoins a uid=${uid}. Nuevo saldo:`,
-                        user?.coinsBalance
-                    );
+                    console.log(`✅ Acreditadas ${credit} ThemiCoins a uid=${uid}. Nuevo saldo:`, user?.coinsBalance);
                 } else {
                     console.warn("Webhook: metadata incompleta", payment.metadata);
                 }
@@ -126,6 +70,6 @@ export async function POST(req: NextRequest) {
         }
     }
 
-    /* 5) Responder siempre 200 a MP */
+    // 7) Responder siempre 200
     return NextResponse.json({ received: true });
 }

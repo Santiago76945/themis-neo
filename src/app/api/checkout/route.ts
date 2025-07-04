@@ -28,12 +28,12 @@ export async function POST(request: NextRequest) {
 
         // 2) Validar bundleId recibido
         const { bundleId } = (await request.json()) as { bundleId?: string };
-        const pkg = PACKAGES.find((p) => p.id === bundleId);
+        const pkg = PACKAGES.find(p => p.id === bundleId);
         if (!pkg) {
             return NextResponse.json({ error: "Bundle inválido" }, { status: 400 });
         }
 
-        // 3) Crear preferencia
+        // 3) Crear preferencia en MP
         const mpRes: any = await createPreference({
             items: [{
                 id: pkg.id,
@@ -50,11 +50,14 @@ export async function POST(request: NextRequest) {
             auto_return: "approved",
         });
 
-        // 4) Devolver init_point
+        // 4) Extraer init_point y devolver
         const init_point: string = String(mpRes.init_point ?? mpRes.sandbox_init_point);
         return NextResponse.json({ init_point });
     } catch (err: any) {
         console.error("POST /api/checkout error:", err);
-        return NextResponse.json({ error: err.message || "Error interno" }, { status: 500 });
+        return NextResponse.json(
+            { error: err.message || "Error interno" },
+            { status: 500 }
+        );
     }
 }

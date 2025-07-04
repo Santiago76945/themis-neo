@@ -6,11 +6,8 @@ import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 if (!process.env.MP_ACCESS_TOKEN) {
     throw new Error("MP_ACCESS_TOKEN must be defined");
 }
-if (!process.env.NEXT_PUBLIC_BASE_URL) {
-    throw new Error("NEXT_PUBLIC_BASE_URL must be defined");
-}
 
-// 2) Instanciamos el SDK
+// 2) Instanciamos el SDK nuevo
 const mpClient = new MercadoPagoConfig({
     accessToken: process.env.MP_ACCESS_TOKEN!,
 });
@@ -20,11 +17,8 @@ export const preferenceClient = new Preference(mpClient);
 export const paymentClient = new Payment(mpClient);
 
 /**
- * Crea una preferencia y devuelve el resultado de MP
+ * Crea una preferencia y devuelve el objeto completo de MP (incluye init_point)
  */
 export async function createPreference(data: any): Promise<any> {
-    // Forzamos any para evitar chequeos de tipos en TS
-    const mpRes: any = await preferenceClient.create({ body: data });
-    // Devuelve el objeto entero (contiene init_point)
-    return mpRes;
+    return await preferenceClient.create({ body: data });
 }
