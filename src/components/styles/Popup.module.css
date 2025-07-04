@@ -20,8 +20,6 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    /* este padding lo puse para compensar el que genera la x de cerrar popup arriba */
-    padding-bottom: 5vh;
 }
 
 
