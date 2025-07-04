@@ -99,7 +99,7 @@ export default function TranscriptionDetailPage() {
                         <strong>Coste:</strong> {transcription.coinsCost} ThemiCoins
                     </div>
 
-                    <div className="mt-6 flex gap-4 justify-center">
+                    <div className={styles.buttonGroup}>
                         <button
                             className={`btn ${styles.actionButton}`}
                             onClick={handleCopy}
@@ -115,6 +115,7 @@ export default function TranscriptionDetailPage() {
                             {isDeleting ? "Eliminando..." : "Eliminar"}
                         </button>
                     </div>
+
                 </div>
             )}
         </Popup>

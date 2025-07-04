@@ -212,3 +212,54 @@
     width: 100%;
 }
 
+/* Nuevas clases para tarjetas de transcripción */
+
+/* Nuevas clases para tarjetas de transcripción con fondo beige claro y texto negro */
+
+.cardGrid {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.cardItem {
+    background-color: var(--color-accent);
+    /* beige claro */
+    color: #000;
+    /* texto negro */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cardItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.cardPreview {
+    flex: 1;
+    margin: var(--space-2) 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Separar título y fecha con flex-gap */
+.listItemContent {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-1);
+}
+
+/* Agrupa y centra los botones en la vista de detalle */
+.buttonGroup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    /* separación entre botones */
+    margin-top: 1.5rem;
+}

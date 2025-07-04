@@ -267,49 +267,53 @@ export default function AudioTranscriptionPage() {
 
                     <hr className="divider" />
 
-                    {/* Sección de lista */}
+                    {/* Sección de lista adaptada a cards */}
                     <h2 className={styles.sectionTitle}>Transcripciones</h2>
-                    <section className={styles.list}>
+                    <section className={styles.cardGrid}>  {/* Usamos estilo grid */}
                         {sorted.length === 0 ? (
                             <p className={styles.textCenter}>No hay transcripciones.</p>
                         ) : (
                             sorted.map((t) => (
-                                <div key={t._id} className={styles.listItem}>
+                                <div key={t._id} className={`card ${styles.cardItem}`}>  {/* Card individual */}
                                     <div className={styles.listItemHeaderGrid}>
                                         <div className={styles.listItemContent}>
-                                            <strong>{t.title} </strong>
+                                            <strong>{t.title}</strong>
                                             <span className={styles.listItemDate}>
                                                 {new Date(t.createdAt).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <div className={styles.listItemActions}>
-                                            <button
-                                                className={`btn ${styles.actionButton}`}
-                                                onClick={() => setSelected(t)}
-                                                disabled={isProcessing}
-                                            >
-                                                Ver
-                                            </button>
-                                            <button
-                                                className={`btn ${styles.actionButton}`}
-                                                onClick={() => handleCopy(t._id, t.text)}
-                                                disabled={isProcessing}
-                                            >
-                                                Copiar
-                                            </button>
-                                            {copiedId === t._id && (
-                                                <span className={styles.copyConfirm}>
-                                                    Copiado!
-                                                </span>
-                                            )}
-                                            <button
-                                                className={`btn ${styles.actionButton}`}
-                                                onClick={() => handleDelete(t._id)}
-                                                disabled={isProcessing}
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
+                                    </div>
+                                    <div className={styles.cardPreview}>
+                                        {/* Vista previa del texto */}
+                                        <p>{t.text}</p>
+                                    </div>
+                                    <div className={styles.listItemActions}>  {/* Acciones */}
+                                        <button
+                                            className={`btn ${styles.actionButton}`}
+                                            onClick={() => setSelected(t)}
+                                            disabled={isProcessing}
+                                        >
+                                            Ver
+                                        </button>
+                                        <button
+                                            className={`btn ${styles.actionButton}`}
+                                            onClick={() => handleCopy(t._id, t.text)}
+                                            disabled={isProcessing}
+                                        >
+                                            Copiar
+                                        </button>
+                                        {copiedId === t._id && (
+                                            <span className={styles.copyConfirm}>
+                                                Copiado!
+                                            </span>
+                                        )}
+                                        <button
+                                            className={`btn ${styles.actionButton}`}
+                                            onClick={() => handleDelete(t._id)}
+                                            disabled={isProcessing}
+                                        >
+                                            Eliminar
+                                        </button>
                                     </div>
                                 </div>
                             ))
