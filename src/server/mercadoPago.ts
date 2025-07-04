@@ -2,17 +2,17 @@
 
 import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 
-// 1) Verificamos vars de entorno
+// Validar ENV
 if (!process.env.MP_ACCESS_TOKEN) {
     throw new Error("MP_ACCESS_TOKEN must be defined");
 }
 
-// 2) Instanciamos el SDK nuevo
+// Instanciar SDK
 const mpClient = new MercadoPagoConfig({
     accessToken: process.env.MP_ACCESS_TOKEN!,
 });
 
-// 3) Creamos los clientes
+// Exportar clientes
 export const preferenceClient = new Preference(mpClient);
 export const paymentClient = new Payment(mpClient);
 
