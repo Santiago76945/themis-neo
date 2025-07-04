@@ -25,9 +25,16 @@ export default function SuccessPage() {
                 </p>
                 <button
                     className={styles.successPageButton}
-                    onClick={() => router.push("/menu/audio-transcription")}
+                    onClick={() => {
+                        // Si hay historial, volvemos atrás; si no, al home
+                        if (window.history.length > 1) {
+                            router.back();
+                        } else {
+                            router.push("/");
+                        }
+                    }}
                 >
-                    Volver a Transcripciones
+                    Volver al sitio
                 </button>
             </div>
         </div>

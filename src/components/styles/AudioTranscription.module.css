@@ -1,36 +1,80 @@
-/* src/components/styles/AudioTranscription.module.css */
+/* src/components/styles/CoinPurchaseModal.module.css */
 
-/* Contenedor de página */
-.pageContainer {
-    height: 100%;
+/* Overlay semitransparente */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: var(--space-4);
+    z-index: 1000;
+}
+
+/* Caja principal del modal */
+.modal {
+    background-color: var(--color-surface);
+    border-radius: 12px;
+    padding: var(--space-4);
     width: 100%;
-    overflow-x: hidden;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    position: relative;
 }
 
-/* Tarjeta principal de transcripción */
-.transcriptionCard {
-    height: 80dvh;
+/* Encabezado del modal */
+.header {
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    width: 90vw;
-    max-width: 800px;
-}
-
-/* Uniformidad de altura para todos los botones/labels */
-.transcriptionCard .btn {
-    height: 2.5rem;
-    min-height: 2.5rem;
-    display: inline-flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    padding: 0 var(--space-3);
+    margin-bottom: var(--space-3);
 }
 
-/* Encabezado */
+.header h2 {
+    font-size: var(--font-size-lg);
+    color: var(--color-accent);
+}
+
+/* Botón de cerrar (X) */
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--color-on-surface);
+    transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+    color: var(--color-link-hover);
+}
+
+/* Cuerpo del modal */
+.body {
+    margin-bottom: var(--space-4);
+    color: var(--color-on-surface);
+    line-height: 1.4;
+}
+
+/* Footer con acciones */
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+}
+
+/* Botones dentro del modal */
+.footer .btn {
+    min-width: 100px;
+}
+
+
 .header {
     display: flex;
     flex-direction: column;
@@ -38,168 +82,104 @@
     padding: var(--space-4);
     border-bottom: 1px solid var(--color-border);
     width: 100%;
+    gap: var(--space-2);
+    /* opcional: separa título y controles */
 }
 
-/* Título de la página */
 .pageTitle {
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-accent);
     text-align: center;
+    width: 100%;
+    /* fuerza a ocupar la línea entera */
 }
 
-/* Controles del encabezado */
 .headerControls {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--space-4);
-    margin-top: var(--space-2);
     width: 100%;
-    justify-content: center;
-}
-
-/* Contador de ThemiCoin */
-.coinCounter {
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-base);
-}
-
-/* Contenido principal con scroll */
-.content {
-    flex: 1;
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: var(--space-4);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
-
-/* Filas flexibles para agrupar elementos */
-.row {
-    display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
-    align-items: center;
-    width: 100%;
-}
-
-.row>* {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-}
-
-/* Sección de herramientas */
-.tools {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    align-items: center;
-    width: 100%;
-}
-
-.tools>* {
-    flex: 1;
-    min-width: 0;
-}
-
-/* Entrada de archivo */
-.fileInput {
-    display: flex;
-    flex-direction: column;
     gap: var(--space-2);
-    flex: 1;
-    min-width: 0;
+    margin-top: var(--space-2);
 }
 
-.fileInput input[type="file"] {
-    display: none;
-}
-
-.fileInput label {
-    cursor: pointer;
-}
-
-/* Nombre de archivo */
-.fileInfo {
-    font-size: 0.875rem;
-    color: var(--color-on-surface);
-    text-align: center;
-}
-
-/* Campo de título */
-.input {
-    flex: 1;
-    min-width: 0;
-    margin: var(--space-1) 0;
-}
-
-/* Estimación de coste */
-.estimation {
-    flex: 1;
-    min-width: 0;
-    font-size: var(--font-size-base);
-    text-align: center;
-}
-
-/* Filtros y búsqueda */
-.controlsSection {
+/* Contenedor izquierdo: saldo y comprar */
+.headerLeft {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    justify-content: center;
-    width: 100%;
-}
-
-.controlsSection>* {
-    flex: 1;
-    min-width: 0;
-}
-
-/* Lista de transcripciones */
-.list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    width: 100%;
-}
-
-/* Ítem individual */
-.listItem {
-    background-color: var(--color-surface);
-    padding: var(--space-3);
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Grid para título/fecha vs. acciones */
-.listItemHeaderGrid {
-    display: grid;
-    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: var(--space-3);
-    width: 100%;
+    gap: var(--space-2);
 }
 
-/* Contenido de título y fecha */
-.listItemContent {
+/* Contenedor derecho: volver */
+.headerRight {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
+    align-items: center;
 }
 
-/* Acciones apiladas */
-.listItemActions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: var(--space-1);
+.sectionTitle {
+    font-size: 1.125rem;
+    /* Más chico que el título principal */
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent);
+    margin: var(--space-2) 0 var(--space-3);
+    letter-spacing: 0.05em;
 }
 
-/* Anular márgenes globales entre botones */
-.listItemActions .btn+.btn {
-    margin-left: 0 !important;
+.listItemActions>button {
+    margin-top: 20px;
+}
+
+/* Asegura que el label de subida luzca como un botón .btn */
+.fileInput label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.5rem;
+    /* misma altura que .btn */
+    padding: 0 var(--space-3);
+    /* mismo padding horizontal */
+    border-radius: 8px;
+    /* mismo radio */
+    background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+    color: var(--color-accent);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.fileInput label:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+}
+
+/* Oculta por completo el input nativo */
+.fileInput input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Oculta por completo el input nativo */
+.fileInput input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Asegura que el wrapper mantenga su flujo */
+.fileInput {
+    position: relative;
+    display: inline-block;
+}
+
+/* Espacio arriba del campo de título y botón de transcripción */
+.titleAndAction {
+    margin-top: var(--space-2);
 }

@@ -11,7 +11,9 @@ import {
     postTranscription,
     deleteTranscription,
 } from "@/lib/apiClient";
+import Popup from "@/components/Popup";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
+import TranscriptionDetail from "@/components/TranscriptionDetail";
 import styles from "@/components/styles/AudioTranscription.module.css";
 
 interface Transcription {
@@ -37,21 +39,18 @@ export default function AudioTranscriptionPage() {
     const [transcripts, setTranscripts] = useState<Transcription[]>([]);
     const [isModalOpen, setModalOpen] = useState(false);
 
-    // Refresca saldo al montarse y cuando cambia usuario
+    const [selected, setSelected] = useState<Transcription | null>(null);
+
     useEffect(() => {
-        if (user) {
-            refreshCoins();
-        }
+        if (user) refreshCoins();
     }, [user, refreshCoins]);
 
-    // Carga inicial de transcripciones
     useEffect(() => {
         if (!user) return;
         (async () => {
             try {
                 const data = await getTranscriptions();
                 if (Array.isArray(data)) setTranscripts(data);
-                else console.error("API /transcriptions devolvió:", data);
             } catch (e) {
                 console.error("Error cargando transcripciones:", e);
             }
@@ -107,7 +106,7 @@ export default function AudioTranscriptionPage() {
         setIsProcessing(true);
         try {
             const fileUrl = await uploadAudioFile(file, user.uid);
-            const created: Transcription = await postTranscription({ title, fileUrl });
+            const created = await postTranscription({ title, fileUrl });
             setTranscripts((prev) => [created, ...prev]);
             setFile(null);
             setTitle("");
@@ -135,7 +134,6 @@ export default function AudioTranscriptionPage() {
         }
     };
 
-    // Filtrar + ordenar
     const filtered = transcripts.filter((t) =>
         t.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -158,27 +156,35 @@ export default function AudioTranscriptionPage() {
 
             <div className={`card ${styles.transcriptionCard}`}>
                 <header className={styles.header}>
-                    <h1 className={styles.pageTitle}>Transcripción de audio a texto</h1>
+                    <h1 className={styles.pageTitle}>
+                        Transcripción de audio a texto
+                    </h1>
                     <div className={styles.headerControls}>
-                        <div className={styles.coinCounter}>
-                            Saldo: {coinsBalance.toFixed(2)} ThemiCoin
+                        <div className={styles.headerLeft}>
+                            <div className={styles.coinCounter}>
+                                Saldo: {coinsBalance.toFixed(2)} ThemiCoin
+                            </div>
+                            <button
+                                className={`btn ${styles.actionButton}`}
+                                onClick={() => setModalOpen(true)}
+                                disabled={isProcessing}
+                            >
+                                + Comprar
+                            </button>
                         </div>
-                        <button
-                            className={`btn ${styles.actionButton}`}
-                            onClick={() => setModalOpen(true)}
-                            disabled={isProcessing}
-                        >
-                            + Comprar
-                        </button>
-                        <button
-                            className={`btn ${styles.actionButton}`}
-                            onClick={() => router.push("/menu")}
-                            disabled={isProcessing}
-                        >
-                            Volver al menú
-                        </button>
+                        <div className={styles.headerRight}>
+                            <button
+                                className={`btn ${styles.actionButton}`}
+                                onClick={() => router.push("/menu")}
+                                disabled={isProcessing}
+                            >
+                                Volver al menú
+                            </button>
+                        </div>
                     </div>
                 </header>
+
+                <h2 className={styles.sectionTitle}>Carga y Transcripción</h2>
 
                 <div className={styles.content}>
                     {isProcessing && (
@@ -186,7 +192,9 @@ export default function AudioTranscriptionPage() {
                             ⏳ Procesando... por favor espera.
                         </div>
                     )}
-                    {error && <div className={styles.errorMessage}>{error}</div>}
+                    {error && (
+                        <div className={styles.errorMessage}>{error}</div>
+                    )}
 
                     <section className={styles.tools}>
                         <div className={styles.fileInput}>
@@ -200,86 +208,126 @@ export default function AudioTranscriptionPage() {
                             <label
                                 htmlFor="audioUpload"
                                 className={`btn ${styles.actionButton}`}
-                                onClick={() => coinsBalance <= 0 && setModalOpen(true)}
+                                onClick={() =>
+                                    coinsBalance <= 0 && setModalOpen(true)
+                                }
                             >
                                 📂 Subir archivo
                             </label>
-                            {file && <span className={styles.fileInfo}>{file.name}</span>}
+                            {file && (
+                                <span className={styles.fileInfo}>
+                                    {file.name}
+                                </span>
+                            )}
                             <small className={styles.fileInfo}>
-                                Formatos permitidos: mp3, wav, m4a — hasta 25 MB.
+                                Formatos permitidos: mp3, wav, m4a — hasta 25
+                                MB.
                             </small>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Título de la transcripción"
-                            value={title}
-                            onChange={(e) => { setTitle(e.target.value); setError(""); }}
-                            className="input"
-                            disabled={isProcessing}
-                        />
-                        <button
-                            className={`btn ${styles.actionButton}`}
-                            onClick={handleTranscribe}
-                            disabled={isProcessing || coinsBalance <= 0}
-                        >
-                            {isProcessing ? "Procesando..." : "Iniciar transcripción"}
-                        </button>
+                        <div className={styles.titleAndAction}>
+                            <input
+                                type="text"
+                                placeholder="Título de la transcripción"
+                                value={title}
+                                onChange={(e) => {
+                                    setTitle(e.target.value);
+                                    setError("");
+                                }}
+                                className="input"
+                                disabled={isProcessing}
+                            />
+                            <button
+                                className={`btn ${styles.actionButton}`}
+                                onClick={handleTranscribe}
+                                disabled={isProcessing || coinsBalance <= 0}
+                            >
+                                {isProcessing
+                                    ? "Procesando..."
+                                    : "Iniciar transcripción"}
+                            </button>
+                        </div>
                     </section>
+
+                    <hr className="divider" />
+                    <h2 className={styles.sectionTitle}>Buscar y Filtrar</h2>
 
                     <section className={styles.tools}>
                         <input
                             type="text"
                             placeholder="Buscar transcripción"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) =>
+                                setSearchTerm(e.target.value)
+                            }
                             className="input"
                             disabled={isProcessing}
                         />
                         <select
                             value={sortOption}
-                            onChange={(e) => setSortOption(e.target.value as any)}
+                            onChange={(e) =>
+                                setSortOption(
+                                    e.target.value as "date" | "name"
+                                )
+                            }
                             className="input"
                             disabled={isProcessing}
                         >
-                            <option value="date">Fecha (reciente → antigua)</option>
+                            <option value="date">
+                                Fecha (reciente → antigua)
+                            </option>
                             <option value="name">Nombre (A → Z)</option>
                         </select>
                     </section>
 
+                    <hr className="divider" />
+                    <h2 className={styles.sectionTitle}>Transcripciones</h2>
+
                     <section className={styles.list}>
                         {sorted.length === 0 ? (
-                            <p className={styles.textCenter}>No hay transcripciones.</p>
+                            <p className={styles.textCenter}>
+                                No hay transcripciones.
+                            </p>
                         ) : (
                             sorted.map((t) => (
                                 <div key={t._id} className={styles.listItem}>
-                                    <div className={styles.listItemHeader}>
-                                        <strong>{t.title}</strong>
-                                        <span className={styles.listItemDate}>
-                                            {new Date(t.createdAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                    <div className={styles.listItemActions}>
-                                        <button
-                                            className={`btn ${styles.actionButton}`}
-                                            onClick={() => router.push(`/menu/audio-transcription/${t._id}`)}
-                                            disabled={isProcessing}
-                                        >
-                                            Ver
-                                        </button>
-                                        <button
-                                            className={`btn ${styles.actionButton}`}
-                                            onClick={() => navigator.clipboard.writeText(t.text)}
-                                            disabled={isProcessing}
-                                        >
-                                            Copiar
-                                        </button>
-                                        <button
-                                            className={`btn ${styles.actionButton}`}
-                                            onClick={() => handleDelete(t._id)}
-                                            disabled={isProcessing}
-                                        >
-                                            Eliminar
-                                        </button>
+                                    <div className={styles.listItemHeaderGrid}>
+                                        <div className={styles.listItemContent}>
+                                            <strong>{t.title} </strong>
+                                            <span className={styles.listItemDate}>
+                                                {new Date(
+                                                    t.createdAt
+                                                ).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <div className={styles.listItemActions}>
+                                            <button
+                                                className={`btn ${styles.actionButton}`}
+                                                onClick={() => setSelected(t)}
+                                                disabled={isProcessing}
+                                            >
+                                                Ver
+                                            </button>
+                                            <button
+                                                className={`btn ${styles.actionButton}`}
+                                                onClick={() =>
+                                                    navigator.clipboard.writeText(
+                                                        t.text
+                                                    )
+                                                }
+                                                disabled={isProcessing}
+                                            >
+                                                Copiar
+                                            </button>
+                                            <button
+                                                className={`btn ${styles.actionButton}`}
+                                                onClick={() =>
+                                                    handleDelete(t._id)
+                                                }
+                                                disabled={isProcessing}
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))
@@ -287,6 +335,17 @@ export default function AudioTranscriptionPage() {
                     </section>
                 </div>
             </div>
+
+            <Popup
+                isOpen={!!selected}
+                onClose={() => setSelected(null)}
+                width="800px"
+                height="auto"
+                zIndex={1500}
+            >
+                {selected && <TranscriptionDetail transcription={selected} />}
+            </Popup>
         </div>
     );
 }
+
