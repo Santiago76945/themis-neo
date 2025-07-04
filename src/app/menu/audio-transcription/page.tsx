@@ -40,6 +40,8 @@ export default function AudioTranscriptionPage() {
     const [transcripts, setTranscripts] = useState<Transcription[]>([]);
     const [isModalOpen, setModalOpen] = useState(false);
     const [selected, setSelected] = useState<Transcription | null>(null);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [popupCopied, setPopupCopied] = useState(false);
 
     useEffect(() => {
         if (user) refreshCoins();
@@ -126,6 +128,7 @@ export default function AudioTranscriptionPage() {
         try {
             await deleteTranscription(id);
             setTranscripts((prev) => prev.filter((t) => t._id !== id));
+            if (selected?._id === id) setSelected(null);
         } catch (err: any) {
             console.error("Eliminar transcripción:", err);
             setError(err.message || "No se pudo eliminar la transcripción.");
@@ -134,6 +137,13 @@ export default function AudioTranscriptionPage() {
         }
     };
 
+    const handleCopy = (id: string, text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    // Filtrado y orden
     const filtered = transcripts.filter((t) =>
         t.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -148,35 +158,35 @@ export default function AudioTranscriptionPage() {
             <CoinPurchaseModal
                 visible={isModalOpen}
                 onClose={() => setModalOpen(false)}
-                onPurchase={async (amount: number) => {
+                onPurchase={async () => {
                     await refreshCoins();
                     setModalOpen(false);
                 }}
             />
 
             <div className={`card ${styles.transcriptionCard}`}>
+                {/* Toolbar fijo */}
                 <Toolbar
                     balance={coinsBalance}
                     onBack={() => router.push("/menu")}
                     onBuy={() => setModalOpen(true)}
                 />
 
-                <h1 className={styles.pageTitle}>
-                    Transcripción de audio a texto
-                </h1>
-
-                <h2 className={styles.sectionTitle}>Carga y Transcripción</h2>
-
+                {/* Contenido desplazable */}
                 <div className={styles.content}>
+                    {/* Título principal */}
+                    <h1 className={styles.mainTitle}>Mis Transcripciones de Audio</h1>
+
+                    {/* Mensajes */}
                     {isProcessing && (
                         <div className={styles.processingMessage}>
                             ⏳ Procesando... por favor espera.
                         </div>
                     )}
-                    {error && (
-                        <div className={styles.errorMessage}>{error}</div>
-                    )}
+                    {error && <div className={styles.errorMessage}>{error}</div>}
 
+                    {/* Sección de carga */}
+                    <h2 className={styles.sectionTitle}>Carga y Transcripción</h2>
                     <section className={styles.tools}>
                         <div className={styles.fileInput}>
                             <input
@@ -189,9 +199,7 @@ export default function AudioTranscriptionPage() {
                             <label
                                 htmlFor="audioUpload"
                                 className={`btn ${styles.actionButton}`}
-                                onClick={() =>
-                                    coinsBalance <= 0 && setModalOpen(true)
-                                }
+                                onClick={() => coinsBalance <= 0 && setModalOpen(true)}
                             >
                                 📂 Subir archivo
                             </label>
@@ -225,8 +233,9 @@ export default function AudioTranscriptionPage() {
                     </section>
 
                     <hr className="divider" />
-                    <h2 className={styles.sectionTitle}>Buscar y Filtrar</h2>
 
+                    {/* Sección de búsqueda */}
+                    <h2 className={styles.sectionTitle}>Buscar y Filtrar</h2>
                     <section className={styles.tools}>
                         <input
                             type="text"
@@ -236,6 +245,13 @@ export default function AudioTranscriptionPage() {
                             className="input"
                             disabled={isProcessing}
                         />
+                        <button
+                            className={`btn ${styles.actionButton}`}
+                            onClick={() => { }}
+                            disabled={isProcessing}
+                        >
+                            Buscar
+                        </button>
                         <select
                             value={sortOption}
                             onChange={(e) =>
@@ -250,8 +266,9 @@ export default function AudioTranscriptionPage() {
                     </section>
 
                     <hr className="divider" />
-                    <h2 className={styles.sectionTitle}>Transcripciones</h2>
 
+                    {/* Sección de lista */}
+                    <h2 className={styles.sectionTitle}>Transcripciones</h2>
                     <section className={styles.list}>
                         {sorted.length === 0 ? (
                             <p className={styles.textCenter}>No hay transcripciones.</p>
@@ -260,7 +277,7 @@ export default function AudioTranscriptionPage() {
                                 <div key={t._id} className={styles.listItem}>
                                     <div className={styles.listItemHeaderGrid}>
                                         <div className={styles.listItemContent}>
-                                            <strong>{t.title}</strong>
+                                            <strong>{t.title} </strong>
                                             <span className={styles.listItemDate}>
                                                 {new Date(t.createdAt).toLocaleDateString()}
                                             </span>
@@ -275,13 +292,16 @@ export default function AudioTranscriptionPage() {
                                             </button>
                                             <button
                                                 className={`btn ${styles.actionButton}`}
-                                                onClick={() =>
-                                                    navigator.clipboard.writeText(t.text)
-                                                }
+                                                onClick={() => handleCopy(t._id, t.text)}
                                                 disabled={isProcessing}
                                             >
                                                 Copiar
                                             </button>
+                                            {copiedId === t._id && (
+                                                <span className={styles.copyConfirm}>
+                                                    Copiado!
+                                                </span>
+                                            )}
                                             <button
                                                 className={`btn ${styles.actionButton}`}
                                                 onClick={() => handleDelete(t._id)}
@@ -296,17 +316,46 @@ export default function AudioTranscriptionPage() {
                         )}
                     </section>
                 </div>
-            </div>
 
-            <Popup
-                isOpen={!!selected}
-                onClose={() => setSelected(null)}
-                width="90vw"
-                height="auto"
-                zIndex={1500}
-            >
-                {selected && <TranscriptionDetail transcription={selected} />}
-            </Popup>
+                {/* Popup de detalle */}
+                {selected && (
+                    <Popup
+                        isOpen={true}
+                        onClose={() => {
+                            setSelected(null);
+                            setPopupCopied(false);
+                        }}
+                        width="90vw"
+                        height="auto"
+                        zIndex={1500}
+                    >
+                        <TranscriptionDetail transcription={selected} />
+                        <div className="mt-4 text-center">
+                            <button
+                                className={`btn ${styles.actionButton}`}
+                                onClick={() => {
+                                    handleCopy(selected._id, selected.text);
+                                    setPopupCopied(true);
+                                }}
+                            >
+                                Copiar texto
+                            </button>
+                            <button
+                                className={`btn ${styles.actionButton} ml-2`}
+                                onClick={() => handleDelete(selected._id)}
+                            >
+                                Eliminar
+                            </button>
+                            {popupCopied && (
+                                <p className={styles.copyConfirm}>
+                                    Texto copiado al portapapeles
+                                </p>
+                            )}
+                        </div>
+                    </Popup>
+                )}
+            </div>
         </div>
     );
 }
+

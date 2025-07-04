@@ -76,8 +76,8 @@ body {
     font-weight: var(--font-weight-normal);
     color: var(--color-on-surface);
     background-color: var(--color-background);
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
     line-height: 1.5;
 }
 
@@ -155,9 +155,9 @@ textarea {
 }
 
 .container {
-    margin: var(--space-4) var(--space-2);
-    padding: var(--space-4) var(--space-2);
     text-align: center;
+    margin-right: 5vw;
+    margin-left: 5vw;
 }
 
 
@@ -168,6 +168,8 @@ textarea {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     width: 100%;
     max-width: none;
+    max-height: 90vh;
+    max-height: 90dvh;
     margin: var(--space-4) auto;
     position: relative;
     z-index: 10;
