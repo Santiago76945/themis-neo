@@ -7,9 +7,10 @@ import { verifyIdToken } from "@/lib/firebaseAdmin";
 
 export async function GET(
     request: NextRequest,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-    const { id } = context.params;
+    const { id } = await params;
+
     try {
         // Autenticación
         const authHeader = request.headers.get("authorization") || "";
@@ -44,9 +45,10 @@ export async function GET(
 
 export async function DELETE(
     request: NextRequest,
-    context: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-    const { id } = context.params;
+    const { id } = await params;
+
     try {
         // Autenticación
         const authHeader = request.headers.get("authorization") || "";
@@ -76,4 +78,3 @@ export async function DELETE(
         );
     }
 }
-
