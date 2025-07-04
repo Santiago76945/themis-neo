@@ -217,8 +217,6 @@
 
 /* Nuevas clases para tarjetas de transcripción */
 
-/* Nuevas clases para tarjetas de transcripción con fondo beige claro y texto negro */
-
 .cardGrid {
     display: grid;
     gap: var(--space-3);
@@ -236,6 +234,7 @@
     display: flex;
     flex-direction: column;
     transition: transform 0.2s, box-shadow 0.2s;
+    max-width: 80vw;
 }
 
 .cardItem:hover {
@@ -258,11 +257,13 @@
 }
 
 /* Agrupa y centra los botones en la vista de detalle */
-.buttonGroup {
+.listItemActions {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
-    /* separación entre botones */
-    margin-top: 1.5rem;
+}
+
+/* Mantén el margin-top si lo deseas */
+.listItemActions > button {
+    margin-top: 20px;
 }
