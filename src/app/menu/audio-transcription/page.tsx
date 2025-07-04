@@ -31,6 +31,10 @@ export default function AudioTranscriptionPage() {
     const router = useRouter();
     const { user, coinsBalance, refreshCoins } = useAuth();
 
+    // Leer variables de entorno públicas
+    const coinsPerToken = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_TOKEN!);
+    const coinsPerMb = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB!);
+
     const [file, setFile] = useState<File | null>(null);
     const [title, setTitle] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
@@ -70,14 +74,14 @@ export default function AudioTranscriptionPage() {
         const f = e.target.files?.[0] ?? null;
         if (f) {
             const maxSizeMB = 25;
-            const allowedExt = /\.(mp3|wav|m4a)$/i;
+            const allowedExt = /\.(mp3|mp4|mpeg|mpga|m4a|wav|webm)$/i;
             if (f.size > maxSizeMB * 1024 * 1024) {
                 setError(`Archivo demasiado grande. Máximo ${maxSizeMB} MB.`);
                 setFile(null);
                 return;
             }
             if (!allowedExt.test(f.name)) {
-                setError("Formato no soportado. Usa mp3, wav o m4a.");
+                setError("Formato no soportado. Usa mp3, mp4, mpeg, mpga, m4a, wav o webm.");
                 setFile(null);
                 return;
             }
@@ -143,11 +147,11 @@ export default function AudioTranscriptionPage() {
         setTimeout(() => setCopiedId(null), 2000);
     };
 
-    // Filtrado y orden
+    // Filtrado y orden (no muta el array original)
     const filtered = transcripts.filter((t) =>
         t.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const sorted = filtered.sort((a, b) =>
+    const sorted = [...filtered].sort((a, b) =>
         sortOption === "date"
             ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             : a.title.localeCompare(b.title)
@@ -192,7 +196,7 @@ export default function AudioTranscriptionPage() {
                             <input
                                 type="file"
                                 id="audioUpload"
-                                accept=".mp3,.wav,.m4a"
+                                accept=".mp3,.mp4,.mpeg,.mpga,.m4a,.wav,.webm"
                                 onChange={handleFileChange}
                                 disabled={isProcessing || coinsBalance <= 0}
                             />
@@ -207,7 +211,7 @@ export default function AudioTranscriptionPage() {
                                 <span className={styles.fileInfo}>{file.name}</span>
                             )}
                             <small className={styles.fileInfo}>
-                                Formatos permitidos: mp3, wav, m4a — hasta 25 MB.
+                                Formatos permitidos: mp3, mp4, mpeg, mpga, m4a, wav, webm — hasta 25 MB.
                             </small>
                         </div>
                         <div className={styles.titleAndAction}>
@@ -229,7 +233,36 @@ export default function AudioTranscriptionPage() {
                             >
                                 {isProcessing ? "Procesando..." : "Iniciar transcripción"}
                             </button>
+                            <p className={styles.costInfo}>
+                                El costo en ThemiCoins actual es de {coinsPerMb} monedas por MB y {coinsPerToken} monedas por token.
+                            </p>
                         </div>
+                    </section>
+
+                    <hr className="divider" />
+
+                    {/* Recursos externos */}
+                    <h2 className={styles.sectionTitle}>Recursos Externos</h2>
+                    <p>
+                        Si tenés un archivo de video o audio en un formato no compatible, convertilo antes. Si tu archivo supera los 25 MB o querés reducir su tamaño para ahorrar ThemiCoins, podés comprimirlo.
+                    </p>
+                    <section className={styles.tools}>
+                        <a
+                            href="https://convertio.co/es/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`btn ${styles.actionButton}`}
+                        >
+                            Convertir formato
+                        </a>
+                        <a
+                            href="https://www.freeconvert.com/es/mp3-compressor"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`btn ${styles.actionButton}`}
+                        >
+                            Comprimir audio
+                        </a>
                     </section>
 
                     <hr className="divider" />
@@ -269,12 +302,12 @@ export default function AudioTranscriptionPage() {
 
                     {/* Sección de lista adaptada a cards */}
                     <h2 className={styles.sectionTitle}>Transcripciones</h2>
-                    <section className={styles.cardGrid}>  {/* Usamos estilo grid */}
+                    <section className={styles.cardGrid}>
                         {sorted.length === 0 ? (
                             <p className={styles.textCenter}>No hay transcripciones.</p>
                         ) : (
                             sorted.map((t) => (
-                                <div key={t._id} className={`card ${styles.cardItem}`}>  {/* Card individual */}
+                                <div key={t._id} className={`card ${styles.cardItem}`}>
                                     <div className={styles.listItemHeaderGrid}>
                                         <div className={styles.listItemContent}>
                                             <strong>{t.title}</strong>
@@ -283,11 +316,7 @@ export default function AudioTranscriptionPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className={styles.cardPreview}>
-                                        {/* Vista previa del texto */}
-                                        <p>{t.text}</p>
-                                    </div>
-                                    <div className={styles.listItemActions}>  {/* Acciones */}
+                                    <div className={styles.listItemActions}>
                                         <button
                                             className={`btn ${styles.actionButton}`}
                                             onClick={() => setSelected(t)}
@@ -334,9 +363,9 @@ export default function AudioTranscriptionPage() {
                         zIndex={1500}
                     >
                         <TranscriptionDetail transcription={selected} />
-                        <div className="mt-4 text-center">
+                        <div className={styles.popupActions}>
                             <button
-                                className={`btn ${styles.actionButton}`}
+                                className="btn"
                                 onClick={() => {
                                     handleCopy(selected._id, selected.text);
                                     setPopupCopied(true);
@@ -345,16 +374,12 @@ export default function AudioTranscriptionPage() {
                                 Copiar texto
                             </button>
                             <button
-                                className={`btn ${styles.actionButton} ml-2`}
+                                className="btn ml-2"
                                 onClick={() => handleDelete(selected._id)}
                             >
                                 Eliminar
                             </button>
-                            {popupCopied && (
-                                <p className={styles.copyConfirm}>
-                                    Texto copiado al portapapeles
-                                </p>
-                            )}
+                            {popupCopied && <p>Texto copiado al portapapeles</p>}
                         </div>
                     </Popup>
                 )}

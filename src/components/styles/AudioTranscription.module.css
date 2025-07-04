@@ -217,12 +217,6 @@
 
 /* Nuevas clases para tarjetas de transcripción */
 
-.cardGrid {
-    display: grid;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
-}
-
 .cardItem {
     background-color: var(--color-accent);
     /* beige claro */
@@ -230,11 +224,11 @@
     /* texto negro */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-    padding: var(--space-3);
+    padding: var(--space-2);
     display: flex;
     flex-direction: column;
     transition: transform 0.2s, box-shadow 0.2s;
-    max-width: 80vw;
+    max-width: 90vw;
 }
 
 .cardItem:hover {
@@ -259,11 +253,41 @@
 /* Agrupa y centra los botones en la vista de detalle */
 .listItemActions {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
 }
 
 /* Mantén el margin-top si lo deseas */
-.listItemActions > button {
+.listItemActions>button {
     margin-top: 20px;
 }
+
+.popupActions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    /* margen de abajo agregado para compensar x de cerrar en audio transcripcion en detalle pop up*/
+    margin-bottom: 10vh;
+}
+
+/* Margen alrededor del botón de subir archivo */
+.fileInput label {
+    margin: var(--space-2);
+}
+
+/* Agrega margen solo al botón “Buscar” dentro de .tools */
+.tools > button {
+    margin-bottom: 20px;
+}
+
+.titleAndAction > p {
+    margin-top: 20px;
+}
+
+.tools > a {
+    text-decoration: none;
+    margin-top: 10px;
+}
+

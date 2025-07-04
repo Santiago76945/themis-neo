@@ -1,18 +1,6 @@
-/* src/styles/global.css 
-
- * Themis App - Global Styles
- *
- * Lineamientos generales:
- * - Diseño basado en superficies elevadas: fondo oscuro profundo y contenedores ("cards") con fondo ligeramente más claro y sombra sutil.
- * - Paleta de colores: tonos negros/grises (#121212, #1e1e1e, #2c2c2e, #3c3c3d), acento champagne/beige (#f7e7ce) para elementos interactivos.
- * - Tipografía: familia de sistema; tamaños y pesos definidos con variables CSS.
- * - Espaciado: sistema de espaciados modulables (--space-1, --space-2, ...).
- * - Estructura: cada sección dentro de un .container con márgenes horizontales y verticales equilibrados.
- * - Componentes: botones, inputs y enlaces reutilizan las variables y transiciones homogéneas.
- */
+/* src/styles/global.css */
 
 /* Variables CSS */
-
 :root {
     /* Colores */
     --color-background: #121212;
@@ -51,7 +39,6 @@
 }
 
 /* Reset Global */
-
 *,
 *::before,
 *::after {
@@ -63,45 +50,24 @@
 html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
 }
 
 body {
     display: flex;
     justify-content: center;
-    /* centra verticalmente */
     align-items: center;
-    /* centra horizontalmente; quítalo si no lo necesitas */
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-normal);
     color: var(--color-on-surface);
     background-color: var(--color-background);
-    height: 100vh;
-    height: 100dvh;
     line-height: 1.5;
-}
-
-html,
-body {
+    min-height: 100vh;
     overflow-x: hidden;
 }
 
 /* Tipografía y elementos base */
-html {
-    font-size: 100%;
-    -webkit-text-size-adjust: 100%;
-}
-
-body {
-    font-family: var(--font-family-base);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-normal);
-    color: var(--color-on-surface);
-    background-color: var(--color-background);
-    min-height: 100vh;
-    line-height: 1.5;
-}
-
 h1,
 h2,
 h3,
@@ -145,7 +111,6 @@ textarea {
     outline: none;
 }
 
-
 /* Layout y contenedores */
 .header {
     display: flex;
@@ -156,10 +121,8 @@ textarea {
 
 .container {
     text-align: center;
-    margin-right: 5vw;
-    margin-left: 5vw;
+    margin: 0 5vw;
 }
-
 
 /* Componentes – Tarjetas */
 .card {
@@ -170,7 +133,8 @@ textarea {
     max-width: none;
     max-height: 90vh;
     max-height: 90dvh;
-    margin: var(--space-4) auto;
+    margin: var(--space-2) auto;
+    /* reducido de space-4 a space-2 para evitar verticalidad */
     position: relative;
     z-index: 10;
     text-align: left;
@@ -190,7 +154,6 @@ textarea {
 .btn {
     display: inline-block;
     padding: var(--space-2) var(--space-3);
-
     border-radius: 8px;
     cursor: pointer;
     background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
@@ -253,7 +216,6 @@ textarea {
     margin-left: 0 !important;
 }
 
-
 /* Formularios e inputs */
 .input {
     width: 100%;
@@ -278,134 +240,8 @@ textarea {
     color: var(--color-on-surface);
 }
 
-/* Estructura de formularios */
-.form {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--space-3);
-}
-
-.field {
-    display: flex;
-    flex-direction: column;
-}
-
-.field label {
-    margin-bottom: var(--space-1);
-    font-weight: var(--font-weight-bold);
-}
-
-.actionsForm {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: var(--space-2);
-}
-
-/* Buscador */
-.search {
-    margin: var(--space-4) 0 var(--space-2);
-    display: flex;
-    justify-content: flex-end;
-}
-
-
-/* Utilidades (espaciado y helpers) */
-/* Márgenes rápidas */
-.mt-1 {
-    margin-top: var(--space-1) !important;
-}
-
-.mt-2 {
-    margin-top: var(--space-2) !important;
-}
-
-.mt-3 {
-    margin-top: var(--space-3) !important;
-}
-
-.mb-1 {
-    margin-bottom: var(--space-1) !important;
-}
-
-.mb-2 {
-    margin-bottom: var(--space-2) !important;
-}
-
-.mb-3 {
-    margin-bottom: var(--space-3) !important;
-}
-
-/* Evita scroll horizontal */
-html,
-body {
-    overflow-x: hidden;
-}
-
-
-/* Divisores y enlaces */
 .divider {
     border: none;
     border-top: 1px solid var(--color-divider);
     margin: var(--space-4) 0;
 }
-
-a {
-    color: var(--color-link);
-    text-decoration: underline;
-    transition: color 0.2s ease;
-}
-
-a:hover {
-    color: var(--color-link-hover);
-}
-
-/* Modal overlay */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: var(--space-4);
-    z-index: 1000;
-}
-
-/* Modal content box */
-.modalContent {
-    background-color: var(--color-surface);
-    border-radius: 8px;
-    padding: var(--space-4);
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-/* Footer inside modal */
-.modalFooter {
-    display: flex;
-    justify-content: center;
-    margin-top: var(--space-3);
-}
-
-/* Card – ítems interactivos */
-
-.card ul li {
-    transition: background 0.2s ease, box-shadow 0.2s ease;
-    padding: var(--space-1) var(--space-1);
-}
-
-.card ul li:hover {
-    background-color: #2c2c2e;
-    /* un tono ligeramente más claro */
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    /* cursor de mano al pasar */
-}
-
-
