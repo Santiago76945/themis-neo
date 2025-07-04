@@ -1,0 +1,84 @@
+/* src/components/styles/Toolbar.module.css */
+
+.toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2.5rem;
+    /* misma altura que tus .btn */
+    padding: 0 var(--space-3);
+    /* solo espacio horizontal */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* centra verticalmente */
+    background-color: #fff;
+    color: var(--color-background);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom: 1px solid var(--color-border);
+    z-index: 1;
+}
+
+.left,
+.right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.backBtn {
+    background: none;
+    border: none;
+    color: var(--color-background);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    line-height: 1;
+    /* evita salto de línea */
+}
+
+.balance {
+    display: flex;
+    align-items: center;
+    font-size: var(--font-size-base);
+    line-height: 1;
+}
+
+.coin {
+    margin-right: var(--space-1);
+}
+
+.buyBtn {
+    background: var(--color-accent);
+    color: var(--color-background);
+    border-radius: 8px;
+    padding: 0 var(--space-2);
+    /* quita padding vertical */
+    height: 2rem;
+    /* un poco menor que la toolbar */
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.buyBtn:hover {
+    transform: translateY(-2px);
+    background: #e5d9b0;
+}
+
+.toolbarBuyBtn {
+    background: var(--color-accent);
+    color: var(--color-background);
+    border-radius: 8px;
+    padding: 0 var(--space-2);
+    height: 2rem;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.toolbarBuyBtn:hover {
+    transform: translateY(-2px);
+    background: #e5d9b0;
+}

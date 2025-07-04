@@ -22,7 +22,8 @@
     border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: var(--space-3);
-    width: 140px;
+    width: 20vw;
+    max-width: 200px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -39,6 +40,28 @@
     max-width: 100%;
     height: auto;
     margin-bottom: var(--space-2);
+}
+
+/* Media query para pantallas menores a 740px */
+@media (max-width: 740px) {
+    .coinBody {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .coinPackageCard {
+        width: 90vw;
+        max-width: none;
+    }
+
+    .coinPackageImage {
+        max-width: 40vw;
+        margin-bottom: var(--space-2);
+    }
+
+    .coinPackageCard {
+    width: 70vw;
+}
 }
 
 .coinPackageLabel {

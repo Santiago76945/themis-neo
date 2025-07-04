@@ -21,19 +21,24 @@ export async function POST(request: Request) {
         );
     }
 
+    // Inicializo fileUrl como opcional para evitar uso antes de asignación
+    let fileUrl: string | undefined = undefined;
+
     try {
         const authHeader = request.headers.get("authorization") || "";
         const idToken = authHeader.replace("Bearer ", "");
         const { uid: userUid } = await verifyIdToken(idToken);
 
-        const { title, fileUrl } = await request.json();
-        if (typeof title !== "string" || typeof fileUrl !== "string") {
+        const { title, fileUrl: incomingUrl } = await request.json();
+        if (typeof title !== "string" || typeof incomingUrl !== "string") {
             return NextResponse.json(
                 { error: "Faltan los campos 'title' o 'fileUrl'" },
                 { status: 400 }
             );
         }
+        fileUrl = incomingUrl;
 
+        // Descargar audio
         const audioRes = await fetch(fileUrl);
         if (!audioRes.ok) {
             throw new Error(`No se pudo descargar audio: ${audioRes.statusText}`);
@@ -41,18 +46,15 @@ export async function POST(request: Request) {
         const arrayBuffer = await audioRes.arrayBuffer();
         const fileSizeMB = arrayBuffer.byteLength / (1024 * 1024);
 
+        // Preparar archivo para Whisper
         const fileName = fileUrl.split('/').pop()?.split('?')[0] || 'audio';
-        const mimeType = fileName.toLowerCase().endsWith('.mp3')
-            ? 'audio/mpeg'
-            : fileName.toLowerCase().endsWith('.m4a')
-                ? 'audio/m4a'
-                : '';
-        const file = new File(
-            [arrayBuffer],
-            fileName,
-            mimeType ? { type: mimeType } : undefined
-        );
+        const mimeType =
+            fileName.toLowerCase().endsWith('.mp3') ? 'audio/mpeg' :
+            fileName.toLowerCase().endsWith('.m4a') ? 'audio/m4a' :
+            undefined;
+        const file = new File([arrayBuffer], fileName, mimeType ? { type: mimeType } : undefined);
 
+        // Llamada a OpenAI Whisper
         const formData = new FormData();
         formData.append("file", file);
         formData.append("model", "whisper-1");
@@ -72,11 +74,11 @@ export async function POST(request: Request) {
         }
         const text = await aiRes.text();
 
+        // Conectar a DB y debitar monedas
         await connectToDatabase();
-
         const tokens = text.split(/\s+/).filter(Boolean).length;
         const COINS_PER_TOKEN = parseFloat(process.env.COINS_PER_TOKEN || '0');
-        const COINS_PER_MB = parseFloat(process.env.COINS_PER_MB || '0');
+        const COINS_PER_MB    = parseFloat(process.env.COINS_PER_MB    || '0');
         const coinsCost = Math.ceil(tokens * COINS_PER_TOKEN + fileSizeMB * COINS_PER_MB);
 
         const session = await (await import('mongoose')).startSession();
@@ -93,16 +95,28 @@ export async function POST(request: Request) {
         }
         await session.commitTransaction();
 
-        const doc = await Transcription.create({ userUid, title, fileUrl, text, tokens, coinsCost });
+        // Guardar transcripción
+        const doc = await Transcription.create({
+            userUid,
+            title,
+            fileUrl: fileUrl!,
+            text,
+            tokens,
+            coinsCost
+        });
 
+        // Eliminar audio del storage
         try {
-            const storagePath = extractStoragePathFromUrl(fileUrl);
+            const storagePath = extractStoragePathFromUrl(fileUrl!);
             await adminStorage.file(storagePath).delete();
-        } catch { }
+            console.log("Audio eliminado de Firebase Storage:", storagePath);
+        } catch (deleteErr) {
+            console.error("Error eliminando audio en storage:", deleteErr);
+        }
 
         return NextResponse.json(doc, { status: 201 });
     } catch (err: any) {
-        console.error("POST /api/transcriptions error:", err);
+        console.error("POST /api/transcriptions error:", err, "fileUrl:", fileUrl);
         return NextResponse.json({ error: err.message || "Error interno" }, { status: 500 });
     }
 }

@@ -14,11 +14,14 @@
     background-color: var(--color-surface);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    max-width: 90vw;
+    width: 90vw;
+    max-width: 800px;
     max-height: 90vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    /* este padding lo puse para compensar el que genera la x de cerrar popup arriba */
+    padding-bottom: 5vh;
 }
 
 
@@ -52,3 +55,8 @@
     border-radius: 4px;
 }
 
+.modalContent p {
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}

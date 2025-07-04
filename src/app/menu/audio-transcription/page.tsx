@@ -11,6 +11,7 @@ import {
     postTranscription,
     deleteTranscription,
 } from "@/lib/apiClient";
+import Toolbar from "@/components/Toolbar";
 import Popup from "@/components/Popup";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
 import TranscriptionDetail from "@/components/TranscriptionDetail";
@@ -38,7 +39,6 @@ export default function AudioTranscriptionPage() {
     const [sortOption, setSortOption] = useState<"date" | "name">("date");
     const [transcripts, setTranscripts] = useState<Transcription[]>([]);
     const [isModalOpen, setModalOpen] = useState(false);
-
     const [selected, setSelected] = useState<Transcription | null>(null);
 
     useEffect(() => {
@@ -155,34 +155,15 @@ export default function AudioTranscriptionPage() {
             />
 
             <div className={`card ${styles.transcriptionCard}`}>
-                <header className={styles.header}>
-                    <h1 className={styles.pageTitle}>
-                        Transcripción de audio a texto
-                    </h1>
-                    <div className={styles.headerControls}>
-                        <div className={styles.headerLeft}>
-                            <div className={styles.coinCounter}>
-                                Saldo: {coinsBalance.toFixed(2)} ThemiCoin
-                            </div>
-                            <button
-                                className={`btn ${styles.actionButton}`}
-                                onClick={() => setModalOpen(true)}
-                                disabled={isProcessing}
-                            >
-                                + Comprar
-                            </button>
-                        </div>
-                        <div className={styles.headerRight}>
-                            <button
-                                className={`btn ${styles.actionButton}`}
-                                onClick={() => router.push("/menu")}
-                                disabled={isProcessing}
-                            >
-                                Volver al menú
-                            </button>
-                        </div>
-                    </div>
-                </header>
+                <Toolbar
+                    balance={coinsBalance}
+                    onBack={() => router.push("/menu")}
+                    onBuy={() => setModalOpen(true)}
+                />
+
+                <h1 className={styles.pageTitle}>
+                    Transcripción de audio a texto
+                </h1>
 
                 <h2 className={styles.sectionTitle}>Carga y Transcripción</h2>
 
@@ -215,13 +196,10 @@ export default function AudioTranscriptionPage() {
                                 📂 Subir archivo
                             </label>
                             {file && (
-                                <span className={styles.fileInfo}>
-                                    {file.name}
-                                </span>
+                                <span className={styles.fileInfo}>{file.name}</span>
                             )}
                             <small className={styles.fileInfo}>
-                                Formatos permitidos: mp3, wav, m4a — hasta 25
-                                MB.
+                                Formatos permitidos: mp3, wav, m4a — hasta 25 MB.
                             </small>
                         </div>
                         <div className={styles.titleAndAction}>
@@ -241,9 +219,7 @@ export default function AudioTranscriptionPage() {
                                 onClick={handleTranscribe}
                                 disabled={isProcessing || coinsBalance <= 0}
                             >
-                                {isProcessing
-                                    ? "Procesando..."
-                                    : "Iniciar transcripción"}
+                                {isProcessing ? "Procesando..." : "Iniciar transcripción"}
                             </button>
                         </div>
                     </section>
@@ -256,25 +232,19 @@ export default function AudioTranscriptionPage() {
                             type="text"
                             placeholder="Buscar transcripción"
                             value={searchTerm}
-                            onChange={(e) =>
-                                setSearchTerm(e.target.value)
-                            }
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             className="input"
                             disabled={isProcessing}
                         />
                         <select
                             value={sortOption}
                             onChange={(e) =>
-                                setSortOption(
-                                    e.target.value as "date" | "name"
-                                )
+                                setSortOption(e.target.value as "date" | "name")
                             }
                             className="input"
                             disabled={isProcessing}
                         >
-                            <option value="date">
-                                Fecha (reciente → antigua)
-                            </option>
+                            <option value="date">Fecha (reciente → antigua)</option>
                             <option value="name">Nombre (A → Z)</option>
                         </select>
                     </section>
@@ -284,19 +254,15 @@ export default function AudioTranscriptionPage() {
 
                     <section className={styles.list}>
                         {sorted.length === 0 ? (
-                            <p className={styles.textCenter}>
-                                No hay transcripciones.
-                            </p>
+                            <p className={styles.textCenter}>No hay transcripciones.</p>
                         ) : (
                             sorted.map((t) => (
                                 <div key={t._id} className={styles.listItem}>
                                     <div className={styles.listItemHeaderGrid}>
                                         <div className={styles.listItemContent}>
-                                            <strong>{t.title} </strong>
+                                            <strong>{t.title}</strong>
                                             <span className={styles.listItemDate}>
-                                                {new Date(
-                                                    t.createdAt
-                                                ).toLocaleDateString()}
+                                                {new Date(t.createdAt).toLocaleDateString()}
                                             </span>
                                         </div>
                                         <div className={styles.listItemActions}>
@@ -310,9 +276,7 @@ export default function AudioTranscriptionPage() {
                                             <button
                                                 className={`btn ${styles.actionButton}`}
                                                 onClick={() =>
-                                                    navigator.clipboard.writeText(
-                                                        t.text
-                                                    )
+                                                    navigator.clipboard.writeText(t.text)
                                                 }
                                                 disabled={isProcessing}
                                             >
@@ -320,9 +284,7 @@ export default function AudioTranscriptionPage() {
                                             </button>
                                             <button
                                                 className={`btn ${styles.actionButton}`}
-                                                onClick={() =>
-                                                    handleDelete(t._id)
-                                                }
+                                                onClick={() => handleDelete(t._id)}
                                                 disabled={isProcessing}
                                             >
                                                 Eliminar
@@ -339,7 +301,7 @@ export default function AudioTranscriptionPage() {
             <Popup
                 isOpen={!!selected}
                 onClose={() => setSelected(null)}
-                width="800px"
+                width="90vw"
                 height="auto"
                 zIndex={1500}
             >
@@ -348,4 +310,3 @@ export default function AudioTranscriptionPage() {
         </div>
     );
 }
-

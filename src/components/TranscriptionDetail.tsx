@@ -8,7 +8,6 @@ import styles from "@/components/styles/AudioTranscription.module.css";
 export interface Transcription {
     _id: string;
     title: string;
-    fileUrl: string;
     text: string;
     tokens: number;
     coinsCost: number;
@@ -29,13 +28,7 @@ export default function TranscriptionDetail({
                 Creado el {new Date(transcription.createdAt).toLocaleString()}
             </p>
 
-            <audio
-                controls
-                src={transcription.fileUrl}
-                className="w-full my-4"
-            />
-
-            <div className="prose">
+            <div className="prose my-4">
                 <h2>Transcripción</h2>
                 <p>{transcription.text}</p>
             </div>

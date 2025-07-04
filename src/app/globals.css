@@ -406,8 +406,4 @@ a:hover {
     /* cursor de mano al pasar */
 }
 
-button,
-.btn {
-  margin-bottom: 10px;  /* margen inferior */
-  margin-right: 5px;    /* margen izquierdo */
-}
+

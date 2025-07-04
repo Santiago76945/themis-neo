@@ -183,3 +183,24 @@
 .titleAndAction {
     margin-top: var(--space-2);
 }
+
+/* Elimina sólo el padding superior del card para que la toolbar quede flush */
+.transcriptionCard {
+    padding-top: 0;
+}
+
+/* Después, reintroduce espacio interno únicamente en el contenido */
+.content {
+    padding: var(--space-4);
+}
+
+.transcriptionCard {
+    position: relative;
+    /* ya debería estar así para el absolute de la toolbar */
+    padding-top: 6rem;
+    /* el alto de la toolbar */
+    /* mantén el padding-left/right/bottom que ya tenías */
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    padding-bottom: var(--space-4);
+}

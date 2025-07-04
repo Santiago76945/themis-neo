@@ -69,7 +69,7 @@ export default function CoinPurchaseModal({
                             Obtener
                         </button>
                         <img
-                            src="/images/mercadopago.svg"
+                            src="/images/mercadopago-white-logo.png"
                             alt="Mercado Pago Logo"
                             className={styles.mercadoPagoLogo}
                         />
