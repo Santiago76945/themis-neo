@@ -47,6 +47,8 @@
     padding: 0;
 }
 
+/* FUNCIONABA PERO CON SCROLL VERTICAL */
+
 /* html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
@@ -67,7 +69,9 @@ body {
     overflow-x: hidden;
 } */
 
-html {
+/* FUNCIONABA SIN SCROLL VERTICAL PERO TAMPOCO CENTRADO VERTiCAL */
+
+/* html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
@@ -77,18 +81,33 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    /* ya no centras verticalmente */
     min-height: 100dvh;
-    /* viewport dinámico en iOS */
     overflow-x: hidden;
-    /* overflow-y: hidden; */
-    /* opcional si quieres desactivar todo scroll */
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-normal);
     color: var(--color-on-surface);
     background-color: var(--color-background);
     line-height: 1.5;
+} */
+
+html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-on-surface);
+    background-color: var(--color-background);
+    line-height: 1.5;
+    /* ¡SIN display:flex! */
+    overflow-x: hidden;
 }
 
 
