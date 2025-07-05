@@ -35,7 +35,7 @@ export default function Toolbar({
                         height={20}
                         className={styles.coin}
                     />
-                    {balance.toFixed(2)}
+                    {`$${balance.toFixed(2)}`}
                 </span>
                 {onBuy && (
                     <button className={styles.toolbarBuyBtn} onClick={onBuy}>
