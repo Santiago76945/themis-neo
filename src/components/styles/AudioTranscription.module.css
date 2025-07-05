@@ -156,7 +156,7 @@
     /* Este widht achico los margenes laterales de la card */
     width: 95vw;
     max-width: 1000px;
-    max-height: 85vh; 
+    max-height: 85vh;
 }
 
 /* ── Toolbar fija en la parte superior de la tarjeta ─────────────────────── */
@@ -350,4 +350,9 @@
     .copyButton {
         display: none;
     }
+}
+
+/* Agrega margen vertical a los botones de popup individual de cada transcripcion */
+.popupActions {
+    margin-top: var(--space-4);
 }

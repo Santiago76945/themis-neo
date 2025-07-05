@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { uploadAudioFile } from "@/lib/uploadToFirebase";
@@ -34,6 +34,9 @@ export default function AudioTranscriptionPage() {
     // Leer variables de entorno públicas
     const coinsPerToken = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_TOKEN!);
     const coinsPerMb = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB!);
+
+    // ref para scrollear a la lista
+    const listRef = useRef<HTMLDivElement>(null);
 
     const [file, setFile] = useState<File | null>(null);
     const [title, setTitle] = useState("");
@@ -113,9 +116,17 @@ export default function AudioTranscriptionPage() {
         try {
             const fileUrl = await uploadAudioFile(file, user.uid);
             const created = await postTranscription({ title, fileUrl });
+
+            // Añadimos al listado
             setTranscripts((prev) => [created, ...prev]);
+            // Abrimos automáticamente el popup con la nueva transcripción
+            setSelected(created);
+            setPopupCopied(false);
+
+            // Limpiamos inputs
             setFile(null);
             setTitle("");
+            // Refrescamos saldo
             await refreshCoins();
         } catch (err: any) {
             console.error("Transcribir:", err);
@@ -231,8 +242,19 @@ export default function AudioTranscriptionPage() {
                                 onClick={handleTranscribe}
                                 disabled={isProcessing || coinsBalance <= 0}
                             >
-                                {isProcessing ? "Procesando..." : "Iniciar transcripción"}
+                                {isProcessing ? "Procesando..." : "Iniciar"}
                             </button>
+
+                            {/* Botón para scrollear */}
+                            <button
+                                className={`btn ${styles.actionButton}`}
+                                onClick={() =>
+                                    listRef.current?.scrollIntoView({ behavior: "smooth" })
+                                }
+                            >
+                                Ver transcripciones
+                            </button>
+
                             <p className={styles.costInfo}>
                                 El costo en ThemiCoins actual es de {coinsPerMb} monedas por MB y {coinsPerToken} monedas por token.
                             </p>
@@ -280,7 +302,7 @@ export default function AudioTranscriptionPage() {
                         />
                         <button
                             className={`btn ${styles.actionButton}`}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             disabled={isProcessing}
                         >
                             Buscar
@@ -301,53 +323,55 @@ export default function AudioTranscriptionPage() {
                     <hr className="divider" />
 
                     {/* Sección de lista adaptada a cards */}
-                    <h2 className={styles.sectionTitle}>Transcripciones</h2>
-                    <section className={styles.cardGrid}>
-                        {sorted.length === 0 ? (
-                            <p className={styles.textCenter}>No hay transcripciones.</p>
-                        ) : (
-                            sorted.map((t) => (
-                                <div key={t._id} className={`card ${styles.cardItem}`}>
-                                    <div className={styles.listItemHeaderGrid}>
-                                        <div className={styles.listItemContent}>
-                                            <strong>{t.title}</strong>
-                                            <span className={styles.listItemDate}>
-                                                {new Date(t.createdAt).toLocaleDateString()}
-                                            </span>
+                    <div ref={listRef}>
+                        <h2 className={styles.sectionTitle}>Transcripciones</h2>
+                        <section className={styles.cardGrid}>
+                            {sorted.length === 0 ? (
+                                <p className={styles.textCenter}>No hay transcripciones.</p>
+                            ) : (
+                                sorted.map((t) => (
+                                    <div key={t._id} className={`card ${styles.cardItem}`}>
+                                        <div className={styles.listItemHeaderGrid}>
+                                            <div className={styles.listItemContent}>
+                                                <strong>{t.title}</strong>
+                                                <span className={styles.listItemDate}>
+                                                    {new Date(t.createdAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className={styles.listItemActions}>
+                                            <button
+                                                className={`btn ${styles.actionButton}`}
+                                                onClick={() => setSelected(t)}
+                                                disabled={isProcessing}
+                                            >
+                                                Ver
+                                            </button>
+                                            <button
+                                                className={`btn ${styles.actionButton} ${styles.copyButton}`}
+                                                onClick={() => handleCopy(t._id, t.text)}
+                                                disabled={isProcessing}
+                                            >
+                                                Copiar
+                                            </button>
+                                            {copiedId === t._id && (
+                                                <span className={styles.copyConfirm}>
+                                                    Copiado!
+                                                </span>
+                                            )}
+                                            <button
+                                                className={`btn ${styles.actionButton}`}
+                                                onClick={() => handleDelete(t._id)}
+                                                disabled={isProcessing}
+                                            >
+                                                Eliminar
+                                            </button>
                                         </div>
                                     </div>
-                                    <div className={styles.listItemActions}>
-                                        <button
-                                            className={`btn ${styles.actionButton}`}
-                                            onClick={() => setSelected(t)}
-                                            disabled={isProcessing}
-                                        >
-                                            Ver
-                                        </button>
-                                        <button
-                                            className={`btn ${styles.actionButton} ${styles.copyButton}`}
-                                            onClick={() => handleCopy(t._id, t.text)}
-                                            disabled={isProcessing}
-                                        >
-                                            Copiar
-                                        </button>
-                                        {copiedId === t._id && (
-                                            <span className={styles.copyConfirm}>
-                                                Copiado!
-                                            </span>
-                                        )}
-                                        <button
-                                            className={`btn ${styles.actionButton}`}
-                                            onClick={() => handleDelete(t._id)}
-                                            disabled={isProcessing}
-                                        >
-                                            Eliminar
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </section>
+                                ))
+                            )}
+                        </section>
+                    </div>
                 </div>
 
                 {/* Popup de detalle */}
