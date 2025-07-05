@@ -1,6 +1,9 @@
 // src/components/Toolbar.tsx
 
+"use client";
+
 import React from "react";
+import Image from "next/image";
 import styles from "@/components/styles/Toolbar.module.css";
 
 interface ToolbarProps {
@@ -25,7 +28,13 @@ export default function Toolbar({
             </div>
             <div className={styles.right}>
                 <span className={styles.balance}>
-                    <span className={styles.coin}>💰</span>
+                    <Image
+                        src="/icons/themicoin-emoji-style.png"
+                        alt="ThemiCoin"
+                        width={20}
+                        height={20}
+                        className={styles.coin}
+                    />
                     {balance.toFixed(2)}
                 </span>
                 {onBuy && (
