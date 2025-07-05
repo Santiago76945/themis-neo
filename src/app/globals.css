@@ -49,7 +49,7 @@
 
 /* FUNCIONABA PERO CON SCROLL VERTICAL */
 
-/* html {
+html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
@@ -67,31 +67,11 @@ body {
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
-} */
-
-/* FUNCIONABA SIN SCROLL VERTICAL PERO TAMPOCO CENTRADO VERTiCAL */
-
-/* html {
-    font-size: 100%;
-    -webkit-text-size-adjust: 100%;
-    overflow-x: hidden;
 }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    font-family: var(--font-family-base);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-normal);
-    color: var(--color-on-surface);
-    background-color: var(--color-background);
-    line-height: 1.5;
-} */
+/* Funciona sin scroll vertical pero dificil de centrar */
 
-html {
+/* html {
     font-size: 100%;
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
@@ -106,10 +86,8 @@ body {
     color: var(--color-on-surface);
     background-color: var(--color-background);
     line-height: 1.5;
-    /* ¡SIN display:flex! */
     overflow-x: hidden;
-}
-
+} */
 
 /* Tipografía y elementos base */
 h1,
