@@ -55,7 +55,7 @@ export default function LoginPage() {
                         </div>
                         {/* Pie de página original */}
                         <p className={styles.copyright}>
-                            © 2025 Themis Legal Assistant. Software propiedad de Themis.
+                            © 2025 Themis Legal Assistant. Software propiedad de Santiago Haspert Piaggio.
                             Todos los derechos reservados.
                         </p>
                     </div>
