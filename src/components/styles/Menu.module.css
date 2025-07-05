@@ -1,5 +1,11 @@
 /* src/components/styles/Menu.module.css */
 
+/* Restablecer centrado vertical (anula el inline style de height/overflow) */
+.container {
+  height: auto;
+  overflow: visible;
+}
+
 /* Header del Dashboard */
 .menuHeader {
   border: 2px solid var(--color-accent);
@@ -22,33 +28,14 @@
   color: var(--color-on-surface);
 }
 
-/* Sección de invitaciones pendientes */
-.invitationsCard {
-  margin-bottom: var(--space-4);
-}
-.invitationHeader {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  margin-bottom: var(--space-3);
-  color: var(--color-on-surface);
-}
-.invitationItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-2);
-}
-.invitationActions .btn {
-  margin-left: var(--space-2);
-}
-
 /* Grid responsivo de ítems: 2 columnas mínimo en móviles */
 .menuNav {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-4);
-  align-items: stretch;      /* Fuerza altura uniforme */
-  justify-items: center;     /* Centra cada celda */
+  align-items: stretch;   /* Fuerza altura uniforme */
+  justify-items: center;  /* Centra cada celda */
+  /* eliminados: flex:1; overflow-y:auto; */
 }
 
 /* Cada contenedor de ítem */
@@ -124,20 +111,9 @@
 
 /* Limita la altura de la card al viewport y organiza en columna */
 .menuCard {
-  max-height: 85dvh;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-/* Hace scroll sólo en la zona de navegación */
-.menuNav {
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* Asegura que la card no tenga márgenes propios */
-.menuCard {
-  margin: 0; 
+  overflow-y: auto; /* Ahora todo el card, incluido el header, hace scroll */
+  margin: 0;        /* Asegura que no tenga márgenes propios */
 }
