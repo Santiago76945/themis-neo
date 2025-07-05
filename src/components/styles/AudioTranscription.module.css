@@ -278,16 +278,75 @@
 }
 
 /* Agrega margen solo al botón “Buscar” dentro de .tools */
-.tools > button {
+.tools>button {
     margin-bottom: 20px;
 }
 
-.titleAndAction > p {
+.titleAndAction>p {
     margin-top: 20px;
 }
 
-.tools > a {
+.tools>a {
     text-decoration: none;
     margin-top: 10px;
 }
 
+/* Buenas prácticas para botones de acción */
+.actionButton {
+    /* comportamiento flex para centrar icono/texto */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* padding vertical y horizontal equilibrados */
+    padding: 0.5rem 1rem;
+    /* equivalente a var(--space-2) var(--space-3) */
+
+    /* altura fija para alinear con la toolbar y demás botones */
+    height: 2.5rem;
+    /* coincide con la regla global .btn */
+
+    /* ancho mínimo para que no se vea comprimido */
+    min-width: 8rem;
+    /* 128px */
+    max-width: 12rem;
+    /* 192px, para no desbordar en móviles */
+
+    /* texto centrado */
+    text-align: center;
+    white-space: nowrap;
+    /* evita que el texto se rompa */
+
+    /* estilo visual */
+    background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+    color: var(--color-accent);
+    font-size: var(--font-size-base);
+
+    /* bordes suaves y caja incluida en el ancho */
+    border: none;
+    border-radius: 0.5rem;
+    /* 8px */
+    box-sizing: border-box;
+
+    /* transición suave */
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover ligeramente elevado */
+.actionButton:hover {
+    background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
+    transform: translateY(-1px);
+}
+
+/* Focus accesible */
+.actionButton:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* Oculta “Copiar” en pantallas pequeñas */
+@media (max-width: 539px) {
+    .copyButton {
+        display: none;
+    }
+}

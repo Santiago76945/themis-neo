@@ -325,7 +325,7 @@ export default function AudioTranscriptionPage() {
                                             Ver
                                         </button>
                                         <button
-                                            className={`btn ${styles.actionButton}`}
+                                            className={`btn ${styles.actionButton} ${styles.copyButton}`}
                                             onClick={() => handleCopy(t._id, t.text)}
                                             disabled={isProcessing}
                                         >
