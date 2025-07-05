@@ -23,7 +23,7 @@
     padding: var(--space-4);
     width: 100%;
     max-width: 480px;
-    max-height: 90vh;
+    max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
