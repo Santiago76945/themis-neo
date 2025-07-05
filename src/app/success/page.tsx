@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/components/styles/SuccessPage.module.css";
@@ -10,11 +10,24 @@ import styles from "@/components/styles/SuccessPage.module.css";
 export default function SuccessPage() {
     const { refreshCoins } = useAuth();
     const router = useRouter();
+    const [returnTo, setReturnTo] = useState<string | null>(null);
 
     useEffect(() => {
         // Refresca el balance tras la compra/webhook
         refreshCoins();
+        // Leemos la ruta guardada
+        const last = sessionStorage.getItem("returnTo");
+        setReturnTo(last);
+        sessionStorage.removeItem("returnTo");
     }, [refreshCoins]);
+
+    const handleBack = () => {
+        if (returnTo) {
+            router.push(returnTo);
+        } else {
+            router.push("/");
+        }
+    };
 
     return (
         <div className={styles.successPageContainer}>
@@ -25,14 +38,7 @@ export default function SuccessPage() {
                 </p>
                 <button
                     className={styles.successPageButton}
-                    onClick={() => {
-                        // Si hay historial, volvemos atrás; si no, al home
-                        if (window.history.length > 1) {
-                            router.back();
-                        } else {
-                            router.push("/");
-                        }
-                    }}
+                    onClick={handleBack}
                 >
                     Volver al sitio
                 </button>

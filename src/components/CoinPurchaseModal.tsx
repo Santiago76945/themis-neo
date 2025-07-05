@@ -6,6 +6,7 @@ import React from "react";
 import Popup from "./Popup";
 import styles from "@/components/styles/CoinPurchaseModal.module.css";
 import { createCheckoutPreference } from "@/lib/apiClient";
+import { usePathname } from "next/navigation";
 
 interface Package {
     id: string;
@@ -35,8 +36,12 @@ export default function CoinPurchaseModal({
 }: CoinPurchaseModalProps) {
     if (!visible) return null;
 
+    const pathname = usePathname();
+
     const handleBuy = async (pkg: Package) => {
         try {
+            // Guardamos la ruta actual para volver luego
+            sessionStorage.setItem("returnTo", pathname);
             // Ahora enviamos sólo el bundleId al backend
             const { init_point } = await createCheckoutPreference(pkg.id);
             // Redirigimos al checkout de Mercado Pago
