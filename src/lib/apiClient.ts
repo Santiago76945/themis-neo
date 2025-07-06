@@ -23,6 +23,7 @@ async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) {
     return payload;
 }
 
+// ————————————————————————————————————————————————————————
 // Transcripciones
 export const getTranscriptions = () =>
     fetchWithAuth("/api/transcriptions");
@@ -36,6 +37,7 @@ export const postTranscription = (body: { title: string; fileUrl: string }) =>
 export const deleteTranscription = (id: string) =>
     fetchWithAuth(`/api/transcriptions/${id}`, { method: "DELETE" });
 
+// ————————————————————————————————————————————————————————
 // Balance de ThemiCoins
 export interface CoinsBalance {
     coins: number;
@@ -51,6 +53,7 @@ export const purchaseCoins = (amount: number): Promise<CoinsBalance> =>
         body: JSON.stringify({ amount }),
     });
 
+// ————————————————————————————————————————————————————————
 // Checkout de Mercado Pago
 export interface CheckoutPreference {
     init_point: string;
@@ -65,10 +68,30 @@ export const createCheckoutPreference = (
         body: JSON.stringify({ bundleId }),
     });
 
+// ————————————————————————————————————————————————————————
+// Modelos de documentos
+export interface DocumentModel {
+    title: string;
+    content: string;
+    recommendation: string;
+}
+
+/**
+ * Obtiene la lista de modelos JSON (title, content, recommendation)
+ */
+export const getDocumentModels = (): Promise<DocumentModel[]> =>
+    // Nota: no usamos fetchWithAuth porque es pública
+    fetch("/api/document-models").then((res) => {
+        if (!res.ok) throw new Error("No se pudieron cargar los modelos");
+        return res.json();
+    });
+
+// ————————————————————————————————————————————————————————
 // Documentos generados
 export interface DocumentData {
     _id: string;
     userUid: string;
+    title: string;       // ← agregado
     model: string;
     info: string;
     content: string;
@@ -81,9 +104,15 @@ export interface DocumentData {
 export const getDocuments = (): Promise<DocumentData[]> =>
     fetchWithAuth("/api/documents");
 
-export const postDocument = (
-    body: { model: string; info: string }
-): Promise<DocumentData> =>
+// --- Obtener un solo documento por ID ---
+export const getDocument = (id: string): Promise<DocumentData> =>
+    fetchWithAuth(`/api/documents/${id}`);
+
+export const postDocument = (body: {
+    title: string;       // ← ahora incluye title
+    model: string;
+    info: string;
+}): Promise<DocumentData> =>
     fetchWithAuth("/api/documents", {
         method: "POST",
         body: JSON.stringify(body),

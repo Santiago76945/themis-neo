@@ -241,3 +241,34 @@ textarea {
     margin: var(--space-4) 0;
 }
 
+/* Global “.input” reset y buenas prácticas */
+.input {
+    /* Asegura que padding y border no aumenten el ancho total */
+    box-sizing: border-box;
+
+    /* Elimina márgenes predeterminados */
+    margin: 0;
+
+    /* Define un padding interno coherente */
+    padding: var(--space-2) var(--space-3);
+
+    /* Tipografía coherente con el resto de la app */
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    font-family: inherit;
+
+    /* Borde y redondeo ligeros para inputs agradables */
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+
+    /* Transición suave para interacciones */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Estado de foco para accesibilidad */
+.input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.2);
+}
+

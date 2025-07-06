@@ -9,12 +9,21 @@ import User from "@/lib/models/User";
 
 export async function GET(request: NextRequest) {
     try {
-        const auth = request.headers.get("authorization") || "";
-        const token = auth.replace("Bearer ", "");
+        // 1) Autenticación
+        const authHeader = request.headers.get("authorization") || "";
+        const token = authHeader.replace("Bearer ", "");
         const { uid } = await verifyIdToken(token);
 
+        // 2) Conexión a la base de datos
         await connectToDatabase();
-        const docs = await GeneratedDocument.find({ userUid: uid }).sort({ createdAt: -1 });
+
+        // 3) Traer documentos incluyendo explícitamente el título
+        const docs = await GeneratedDocument.find(
+            { userUid: uid },
+            "title model info content tokens coinsCost createdAt updatedAt"
+        ).sort({ createdAt: -1 });
+
+        // 4) Devolver JSON
         return NextResponse.json(docs, { status: 200 });
     } catch (err: any) {
         console.error("GET /api/documents error:", err);
@@ -25,24 +34,35 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
-        const auth = request.headers.get("authorization") || "";
-        const token = auth.replace("Bearer ", "");
+        // 1) Parse & log del body recibido
+        const body = await request.json();
+        console.log("POST /api/documents – body recibido:", JSON.stringify(body, null, 2));
+
+        // 2) Autenticación
+        const authHeader = request.headers.get("authorization") || "";
+        const token = authHeader.replace("Bearer ", "");
         const { uid } = await verifyIdToken(token);
 
-        const { model, info } = await request.json();
-        if (typeof model !== "string" || typeof info !== "string") {
+        // 3) Validación de campos
+        const { title, model, info } = body;
+        if (
+            typeof title !== "string" ||
+            typeof model !== "string" ||
+            typeof info !== "string"
+        ) {
             return NextResponse.json(
-                { error: "Se requieren los campos `model` e `info`" },
+                { error: "Se requieren los campos `title`, `model` e `info`" },
                 { status: 400 }
             );
         }
 
-        // Generar contenido, tokens y coste
+        // 4) Generar contenido con OpenAI
         const { content, tokens, coinsCost } = await generateDocument(model, info);
 
+        // 5) Conexión a la base de datos
         await connectToDatabase();
 
-        // Transacción atómica para restar monedas
+        // 6) Transacción para restar monedas
         const session = await (await import("mongoose")).startSession();
         session.startTransaction();
         const updatedUser = await User.findOneAndUpdate(
@@ -52,15 +72,13 @@ export async function POST(request: NextRequest) {
         );
         if (!updatedUser) {
             await session.abortTransaction();
-            return NextResponse.json(
-                { error: "Saldo insuficiente" },
-                { status: 402 }
-            );
+            return NextResponse.json({ error: "Saldo insuficiente" }, { status: 402 });
         }
         await session.commitTransaction();
 
-        // Guardar documento generado
+        // 7) Crear documento con título
         const doc = await GeneratedDocument.create({
+            title,
             userUid: uid,
             model,
             info,

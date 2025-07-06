@@ -20,8 +20,9 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    /* Este padding aqui para compensar la x de cerrar del popup */
+    padding-bottom: 50px;
 }
-
 
 .modalCloseBtn {
     background: none;
@@ -53,9 +54,10 @@
     border-radius: 4px;
 }
 
+/* Aquí aplicamos interlineado 2.0 y justificación */
 .modalContent p {
     max-width: 90%;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    line-height: 2.0;
+    text-align: justify;
 }
-

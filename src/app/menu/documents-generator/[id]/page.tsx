@@ -1,101 +1,140 @@
+// src/app/menu/documents-generator/[id]/page.tsx
 
-// src/lib/apiClient.ts
+"use client";
 
-import { getAuth } from "firebase/auth";
-import { app } from "@/lib/firebase";
+import React, { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import Toolbar from "@/components/Toolbar";
+import CoinPurchaseModal from "@/components/CoinPurchaseModal";
+import styles from "@/components/styles/DocumentsGenerator.module.css";
+import {
+    getDocument,
+    deleteDocument,
+    DocumentData,
+} from "@/lib/apiClient";
 
-// Helper para incluir el ID token de Firebase
-async function fetchWithAuth(input: RequestInfo, init: RequestInit = {}) {
-    const auth = getAuth(app);
-    const user = auth.currentUser;
-    if (!user) throw new Error("No autorizado");
-    const token = await user.getIdToken();
+export default function DocumentDetailPage() {
+    // Extraer ID de la ruta usando useParams
+    const params = useParams();
+    const id = params.id as string;
+    const router = useRouter();
+    const { user, coinsBalance, refreshCoins } = useAuth();
 
-    const res = await fetch(input, {
-        ...init,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            ...(init.headers || {}),
-        },
-    });
-    const payload = await res.json();
-    if (!res.ok) throw new Error(payload.error || res.statusText);
-    return payload;
+    const [doc, setDoc] = useState<DocumentData | null>(null);
+    const [error, setError] = useState<string>("");
+    const [isPurchaseModalOpen, setPurchaseModalOpen] = useState(false);
+    const [isProcessingDelete, setProcessingDelete] = useState(false);
+
+    useEffect(() => {
+        if (!user) return;
+        (async () => {
+            try {
+                const fetched = await getDocument(id);
+                setDoc(fetched);
+            } catch (e: any) {
+                setError(e.message || "Error cargando el documento");
+            }
+        })();
+    }, [user, id]);
+
+    // Mientras carga
+    if (!doc && !error) {
+        return (
+            <div className={`container ${styles.pageContainer}`}>
+                <p>Cargando…</p>
+            </div>
+        );
+    }
+
+    // Si hay error
+    if (error) {
+        return (
+            <div className={`container ${styles.pageContainer}`}>
+                <p className={styles.errorMessage}>{error}</p>
+                <button className="btn" onClick={() => router.back()}>
+                    ← Volver
+                </button>
+            </div>
+        );
+    }
+
+    // A estas alturas `doc` ya no es null
+    const document = doc!;
+
+    const handleDelete = async () => {
+        setProcessingDelete(true);
+        try {
+            await deleteDocument(id);
+            await refreshCoins();
+            router.back();
+        } catch (e: any) {
+            console.error(e);
+            setError(e.message || "No se pudo eliminar");
+        } finally {
+            setProcessingDelete(false);
+        }
+    };
+
+    return (
+        <div className={`container ${styles.pageContainer}`}>
+            <CoinPurchaseModal
+                visible={isPurchaseModalOpen}
+                onClose={() => setPurchaseModalOpen(false)}
+                onPurchase={async () => {
+                    await refreshCoins();
+                    setPurchaseModalOpen(false);
+                }}
+            />
+
+            <div className={`card ${styles.cardWrapper}`}>
+                <Toolbar
+                    balance={coinsBalance}
+                    onBack={() => router.back()}
+                    onBuy={() => setPurchaseModalOpen(true)}
+                />
+
+                <div className={styles.content}>
+                    {/* Acá mostramos el título del documento */}
+                    <h1 className={styles.mainTitle}>{document.title}</h1>
+
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Modelo</h2>
+                        <p>{document.model}</p>
+                    </section>
+
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Información personalizada</h2>
+                        <p>{document.info}</p>
+                    </section>
+
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Contenido generado</h2>
+                        {document.content.split("\n").map((line, idx) => (
+                            <p key={idx}>{line}</p>
+                        ))}
+                    </section>
+
+                    <section className={styles.section}>
+                        <span>
+                            Creado el {new Date(document.createdAt).toLocaleString()}
+                        </span>
+                    </section>
+
+                    <div className={styles.footer}>
+                        <button className="btn" onClick={() => router.back()}>
+                            ← Volver
+                        </button>
+                        <button
+                            className="btn"
+                            onClick={handleDelete}
+                            disabled={isProcessingDelete}
+                        >
+                            {isProcessingDelete ? "Eliminando…" : "Eliminar"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
-
-// Transcripciones
-export const getTranscriptions = () =>
-    fetchWithAuth("/api/transcriptions");
-
-export const postTranscription = (body: { title: string; fileUrl: string }) =>
-    fetchWithAuth("/api/transcriptions", {
-        method: "POST",
-        body: JSON.stringify(body),
-    });
-
-export const deleteTranscription = (id: string) =>
-    fetchWithAuth(`/api/transcriptions/${id}`, { method: "DELETE" });
-
-// Balance de ThemiCoins
-export interface CoinsBalance {
-    coins: number;
-    coinsPerToken: number;
-}
-
-export const getCoinsBalance = (): Promise<CoinsBalance> =>
-    fetchWithAuth("/api/coins");
-
-export const purchaseCoins = (amount: number): Promise<CoinsBalance> =>
-    fetchWithAuth("/api/coins", {
-        method: "POST",
-        body: JSON.stringify({ amount }),
-    });
-
-// Checkout de Mercado Pago
-export interface CheckoutPreference {
-    init_point: string;
-    id: string;
-}
-
-export const createCheckoutPreference = (
-    bundleId: string
-): Promise<CheckoutPreference> =>
-    fetchWithAuth("/api/checkout", {
-        method: "POST",
-        body: JSON.stringify({ bundleId }),
-    });
-
-// Documentos generados
-export interface DocumentData {
-    _id: string;
-    userUid: string;
-    model: string;
-    info: string;
-    content: string;
-    tokens: number;
-    coinsCost: number;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export const getDocuments = (): Promise<DocumentData[]> =>
-    fetchWithAuth("/api/documents");
-
-export const getDocument = (id: string): Promise<DocumentData> =>
-    fetchWithAuth(`/api/documents/${id}`);
-
-export const postDocument = (
-    body: { model: string; info: string }
-): Promise<DocumentData> =>
-    fetchWithAuth("/api/documents", {
-        method: "POST",
-        body: JSON.stringify(body),
-    });
-
-export const deleteDocument = (
-    id: string
-): Promise<{ success: boolean }> =>
-    fetchWithAuth(`/api/documents/${id}`, {
-        method: "DELETE",
-    });

@@ -1,4 +1,5 @@
 {
     "title": "Recibo de pago",
-    "content": "En la ciudad de Córdoba, a los 5 días del mes de julio de 2025, yo, [NOMBRE DEL RECEPTOR], DNI [DNI], declaro haber recibido de [NOMBRE DEL PAGADOR], con domicilio en [DOMICILIO], la suma de PESOS [MONTO EN LETRAS] ($[MONTO NUMÉRICO]) en concepto de [CONCEPTO DEL PAGO] correspondiente al período [PERÍODO / FECHA]. Dicha suma ha sido abonada en su totalidad y a mi entera satisfacción, no teniendo nada más que reclamar por este concepto."
+    "content": "En la ciudad de Córdoba, a los 5 días del mes de julio de 2025, yo, [NOMBRE DEL RECEPTOR], DNI [DNI], declaro haber recibido de [NOMBRE DEL PAGADOR], con domicilio en [DOMICILIO], la suma de PESOS [MONTO NUMÉRICO] en concepto de [CONCEPTO DEL PAGO] correspondiente al período [PERÍODO / FECHA]. Dicha suma ha sido abonada en su totalidad y a mi entera satisfacción, no teniendo nada más que reclamar por este concepto.",
+    "recommendation": "Proveer al menos: lugar y fecha del recibo, nombre completo del receptor, DNI del receptor, nombre completo del pagador, domicilio del pagador, concepto del pago, monto numérico, período o fecha correspondiente."
 }

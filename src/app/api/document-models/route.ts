@@ -16,8 +16,8 @@ export const GET = async () => {
                 .map(async (fileName) => {
                     const filePath = path.join(modelsDir, fileName);
                     const raw = await fs.readFile(filePath, "utf-8");
-                    const { title, content } = JSON.parse(raw);
-                    return { title, content };
+                    const { title, content, recommendation } = JSON.parse(raw);
+                    return { title, content, recommendation };
                 })
         );
 

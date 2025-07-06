@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 // Atributos necesarios para crear un Documento
 export interface DocumentAttrs {
+    title: string;
     userUid: string;
     model: string;
     info: string;
@@ -15,6 +16,7 @@ export interface DocumentAttrs {
 // Definición del esquema de Mongoose
 const DocumentSchema = new mongoose.Schema(
     {
+        title: { type: String, required: true },
         userUid: { type: String, required: true, index: true },
         model: { type: String, required: true },
         info: { type: String, required: true },
@@ -30,7 +32,7 @@ export type DocumentDoc = mongoose.InferSchemaType<typeof DocumentSchema>;
 
 // Modelo de Mongoose para Document
 const GeneratedDocument =
-    mongoose.models.GeneratedDocument as mongoose.Model<DocumentDoc> ||
+    (mongoose.models.GeneratedDocument as mongoose.Model<DocumentDoc>) ||
     mongoose.model<DocumentDoc>("GeneratedDocument", DocumentSchema);
 
 export default GeneratedDocument;
