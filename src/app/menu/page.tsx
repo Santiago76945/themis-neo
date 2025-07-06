@@ -33,7 +33,12 @@ export default function MenuPage() {
 
     const menuItems = [
         { label: "Transcripción de audio a texto", icon: "/icons/audio-icon.png", path: "/menu/audio-transcription", enabled: true },
-        { label: "Creación de documentos con AI", icon: "/icons/writing-icon.png", path: "/menu/escritos", enabled: false },
+        {
+            label: "Creación de documentos con AI",
+            icon: "/icons/writing-icon.png",
+            path: "/menu/documents-generator",
+            enabled: true
+        },
         { label: "Gestión de clientes", icon: "/icons/clients-icon.png", path: "/menu/clientes", enabled: false },
         { label: "Gestión de casos", icon: "/icons/court-file-icon.png", path: "/menu/casos", enabled: false },
         { label: "Gestión de tareas", icon: "/icons/tasks-icon.png", path: "/menu/tasks", enabled: false },

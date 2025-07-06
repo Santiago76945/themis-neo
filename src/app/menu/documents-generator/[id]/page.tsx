@@ -1,3 +1,4 @@
+
 // src/lib/apiClient.ts
 
 import { getAuth } from "firebase/auth";
@@ -80,6 +81,9 @@ export interface DocumentData {
 
 export const getDocuments = (): Promise<DocumentData[]> =>
     fetchWithAuth("/api/documents");
+
+export const getDocument = (id: string): Promise<DocumentData> =>
+    fetchWithAuth(`/api/documents/${id}`);
 
 export const postDocument = (
     body: { model: string; info: string }
