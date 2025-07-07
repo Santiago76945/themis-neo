@@ -42,12 +42,17 @@ export default function DocumentsGeneratorPage() {
     const [isPurchaseModalOpen, setPurchaseModalOpen] = useState<boolean>(
         false
     );
+
+    // Estado para el feedback de copia
+    const [copied, setCopied] = useState(false);
+
     const [showModelPopup, setShowModelPopup] = useState<boolean>(false);
     const [popupModel, setPopupModel] = useState<DocumentModel | null>(null);
     const [showGeneratedPopup, setShowGeneratedPopup] =
         useState<boolean>(false);
     const [popupDoc, setPopupDoc] = useState<DocumentData | null>(null);
 
+    // Carga inicial de modelos y documentos
     useEffect(() => {
         if (!user) return;
         refreshCoins();
@@ -61,6 +66,7 @@ export default function DocumentsGeneratorPage() {
             .catch((e) => console.error("Error cargando escritos:", e));
     }, [user, refreshCoins]);
 
+    // Filtrado y placeholder
     const filteredModels = models
         .filter((m) => m.title.toLowerCase().includes(searchModel.toLowerCase()))
         .sort((a, b) => a.title.localeCompare(b.title));
@@ -68,6 +74,7 @@ export default function DocumentsGeneratorPage() {
     const placeholderText =
         selectedModel?.recommendation || "Información a personalizar...";
 
+    // Generar escrito
     const handleGenerate = async () => {
         setError("");
         if (!selectedModel) {
@@ -88,6 +95,7 @@ export default function DocumentsGeneratorPage() {
         try {
             const created = await postDocument({
                 title: docTitle.trim(),
+                modelTitle: selectedModel.title,
                 model: selectedModel.content,
                 info: customInfo.trim(),
             });
@@ -107,6 +115,7 @@ export default function DocumentsGeneratorPage() {
         }
     };
 
+    // Eliminar escrito de la lista
     const handleDelete = async (id: string) => {
         try {
             await deleteDocument(id);
@@ -116,15 +125,24 @@ export default function DocumentsGeneratorPage() {
         }
     };
 
+    // Abrir popups
     const openModelPopup = (model: DocumentModel) => {
         setPopupModel(model);
         setShowModelPopup(true);
     };
-
     const openDocPopup = (doc: DocumentData) => {
         setShowModelPopup(false);
         setPopupDoc(doc);
         setShowGeneratedPopup(true);
+    };
+
+    // Handler de copiado (se usa dentro del popup de detalle)
+    const handleCopy = async () => {
+        if (!popupDoc) return;
+        const textToCopy = `${popupDoc.modelTitle}\n\n${popupDoc.content.split("\n").join(" ")}`;
+        await navigator.clipboard.writeText(textToCopy);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
     };
 
     return (
@@ -152,20 +170,35 @@ export default function DocumentsGeneratorPage() {
                     width="800px"
                     zIndex={2000}
                 >
+                    {/* Título que puso el usuario */}
                     <h2 className={styles.mainTitle}>{popupDoc.title}</h2>
-                    <p>
-                        <strong>Modelo:</strong> {popupDoc.model}
-                    </p>
-                    <p>
-                        <strong>Info:</strong> {popupDoc.info}
-                    </p>
+
+                    {/* Encabezado legal: título del modelo */}
+                    <h3 className={styles.sectionTitle}>{popupDoc.modelTitle}</h3>
+
+                    {/* Cuerpo del documento en un solo párrafo */}
                     <div className="prose my-4">
-                        {popupDoc.content.split("\n").map((line, i) => (
-                            <p key={i}>{line}</p>
-                        ))}
+                        <p>{popupDoc.content.split("\n").join(" ")}</p>
                     </div>
+
+                    {/* Espacio antes de acciones */}
+                    <div className="my-4" />
+
+                    {/* Botón de copiar con feedback */}
+                    <button
+                        className={`btn ${styles.modalButton}`}
+                        onClick={handleCopy}
+                        disabled={copied}
+                    >
+                        {copied ? "¡Copiado!" : "Copiar texto"}
+                    </button>
+
+                    {/* Fecha y coste */}
                     <p className={styles.listItemDate}>
                         Creado el {new Date(popupDoc.createdAt).toLocaleString()}
+                    </p>
+                    <p className={styles.listItemDate}>
+                        ThemiCoins consumidos: {popupDoc.coinsCost}
                     </p>
                 </Popup>
             )}
@@ -188,8 +221,7 @@ export default function DocumentsGeneratorPage() {
 
                 <div className={styles.tabs}>
                     <button
-                        className={`${styles.tabButton} ${view === "create" ? styles.active : ""
-                            }`}
+                        className={`${styles.tabButton} ${view === "create" ? styles.active : ""}`}
                         onClick={() => setView("create")}
                     >
                         <img
@@ -201,8 +233,7 @@ export default function DocumentsGeneratorPage() {
                         Crear escrito
                     </button>
                     <button
-                        className={`${styles.tabButton} ${view === "view-models" ? styles.active : ""
-                            }`}
+                        className={`${styles.tabButton} ${view === "view-models" ? styles.active : ""}`}
                         onClick={() => setView("view-models")}
                     >
                         <img

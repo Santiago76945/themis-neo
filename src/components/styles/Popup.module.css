@@ -59,5 +59,14 @@
     max-width: 90%;
     margin: 0 auto;
     line-height: 2.0;
+    text-align: center;
+    /* esta linea hace que los p tengan espacios entre si */
+    margin: 0 auto var(--space-2);
+    /* arriba 0, auto horizontal, abajo espacio */
+}
+
+/* Cuando haga falta un p que deba estar jusitificado */
+.documentBodyText {
     text-align: justify;
 }
+

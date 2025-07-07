@@ -1,85 +1,87 @@
 THEMIS-NEO
-├─ **public**
-│  ├─ images
-│  │  ├─ coins-basic.png
-│  │  ├─ coins-popular.png
-│  │  ├─ coins-premium.png
-│  │  └─ mercadopago.svg
-│  └─ … (resto de imágenes, iconos, etc.)
+├─ public
+│  └─ images
+│     ├─ coins-basic.png
+│     ├─ coins-popular.png
+│     ├─ coins-premium.png
+│     └─ mercadopago.svg
+│     └─ … (más iconos e imágenes)
 │
-├─ **src**
-│  ├─ **app**
-│  │  ├─ **api**
-│  │  │  ├─ **coins**  ← micro-servicio saldo
-│  │  │  │  └─ route.ts  (GET & POST /api/coins)
-│  │  │  ├─ **createUserProfile**
-│  │  │  │  └─ route.ts  (POST /api/createUserProfile)
-│  │  │  ├─ **checkout**  ← micro-servicio checkout
-│  │  │  │  └─ route.ts  (POST /api/checkout)
-│  │  │  ├─ **webhook**  ← micro-servicio webhook
-│  │  │  │  └─ route.ts  (POST /api/webhook)
-│  │  │  └─ **transcriptions**
-│  │  │     ├─ route.ts     (POST & GET /api/transcriptions)
-│  │  │     └─ **\[id]**
-│  │  │        └─ route.ts  (DELETE /api/transcriptions/\[id])
+├─ src
+│  ├─ app
+│  │  ├─ api
+│  │  │  ├─ coins/route.ts
+│  │  │  ├─ createUserProfile/route.ts
+│  │  │  ├─ checkout/route.ts
+│  │  │  ├─ webhook/route.ts
+│  │  │  ├─ transcriptions/route.ts
+│  │  │  ├─ transcriptions/[id]/route.ts
+│  │  │  ├─ documents/route.ts              ← POST & GET documentos
+│  │  │  ├─ documents/[id]/route.ts         ← GET & DELETE por ID
+│  │  │  ├─ document-models/route.ts        ← lista modelos JSON
+│  │  │  └─ documents-generator/[id]/route.ts  (legacy: open single doc)
 │  │  │
-│  │  ├─ **login**
-│  │  │  └─ page.tsx
-│  │  ├─ **menu**
+│  │  ├─ login/page.tsx
+│  │  ├─ menu
 │  │  │  ├─ page.tsx
-│  │  │  └─ **audio-transcription**
-│  │  │     ├─ page.tsx   (listado + subida + acciones)
-│  │  │     └─ **\[id]**
-│  │  │        └─ page.tsx (detalle de una transcripción)
+│  │  │  ├─ audio-transcription
+│  │  │  │  ├─ page.tsx
+│  │  │  │  └─ [id]/page.tsx
+│  │  │  └─ documents-generator
+│  │  │     ├─ page.tsx                     ← lista + crear documentos
+│  │  │     └─ [id]/page.tsx                ← detalle de un documento
 │  │  │
-│  │  ├─ success.tsx     
+│  │  ├─ success.tsx
 │  │  ├─ layout.tsx
-│  │  └─ page.tsx      
+│  │  └─ page.tsx
 │  │
-│  ├─ **components**
+│  ├─ components
+│  │  ├─ Toolbar.tsx
+│  │  ├─ Popup.tsx
+│  │  ├─ CoinPurchaseModal.tsx
+│  │  ├─ CheckoutButton.tsx
 │  │  ├─ ConsoleEffect.tsx
 │  │  ├─ ConsoleEffectWrapper.tsx
-│  │  ├─ Popup.tsx              
-│  │  ├─ CoinPurchaseModal.tsx   
-│  │  ├─ CheckoutButton.tsx      
-│  │  └─ **styles**
+│  │  └─ styles
 │  │     ├─ AudioTranscription.module.css
 │  │     ├─ CoinPurchaseModal.module.css
 │  │     ├─ Popup.module.css
-│  │     ├─ Clients.module.css
-│  │     ├─ GestionCasos.module.css
-│  │     ├─ LoginForm.module.css
+│  │     ├─ DocumentsGenerator.module.css
 │  │     ├─ Menu.module.css
-│  │     ├─ MyLawFirm.module.css
-│  │     ├─ TaskManager.module.css
-│  │     └─ global.css
+│  │     ├─ … (resto de .css)
 │  │
-│  ├─ **context**
-│  │  └─ AuthContext.tsx  
+│  ├─ context
+│  │  └─ AuthContext.tsx
 │  │
-│  ├─ **lib**
-│  │  ├─ **models**
-│  │  │  ├─ User.ts             
-│  │  │  └─ Transcription.ts    
-│  │  ├─ apiClient.ts         
+│  ├─ data
+│  │  └─ documentModels
+│  │     ├─ recibo.json
+│  │     ├─ convenio241.json
+│  │     └─ … (otros modelos)
+│  │
+│  ├─ lib
+│  │  ├─ models
+│  │  │  ├─ User.ts
+│  │  │  ├─ Transcription.ts
+│  │  │  └─ Document.ts                    ← esquema GeneratedDocument
+│  │  ├─ apiClient.ts
 │  │  ├─ db.ts
 │  │  ├─ firebase.ts
 │  │  ├─ firebaseAdmin.ts
 │  │  ├─ uploadToFirebase.ts
-│  │  └─ … (otros helpers)
+│  │  └─ generateDocument.ts              ← GPT-4o + coste tokens
 │  │
-│  ├─ **server**                     
-│  │  └─ mercadoPago.ts         
+│  ├─ server
+│  │  └─ mercadoPago.ts
 │  │
-│  ├─ **utils**
+│  ├─ utils
 │  │  └─ generateCode.ts
 │  │
-│  └─ … (hooks, servicios, etc.)
+│  └─ hooks / servicios / … (otros helpers)
 │
-├─ .env   (IGNORADO en git)
+├─ .env            (IGNORADO en git)
 ├─ .gitignore
 ├─ tsconfig.json
 ├─ next.config.ts
 ├─ package.json
 └─ README.md
-

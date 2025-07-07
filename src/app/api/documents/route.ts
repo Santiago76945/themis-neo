@@ -17,10 +17,10 @@ export async function GET(request: NextRequest) {
         // 2) Conexión a la base de datos
         await connectToDatabase();
 
-        // 3) Traer documentos incluyendo explícitamente el título
+        // 3) Traer documentos del usuario, incluyendo modelTitle
         const docs = await GeneratedDocument.find(
             { userUid: uid },
-            "title model info content tokens coinsCost createdAt updatedAt"
+            "title modelTitle model info content tokens coinsCost createdAt updatedAt"
         ).sort({ createdAt: -1 });
 
         // 4) Devolver JSON
@@ -44,14 +44,15 @@ export async function POST(request: NextRequest) {
         const { uid } = await verifyIdToken(token);
 
         // 3) Validación de campos
-        const { title, model, info } = body;
+        const { title, modelTitle, model, info } = body;
         if (
             typeof title !== "string" ||
+            typeof modelTitle !== "string" ||
             typeof model !== "string" ||
             typeof info !== "string"
         ) {
             return NextResponse.json(
-                { error: "Se requieren los campos `title`, `model` e `info`" },
+                { error: "Se requieren los campos `title`, `modelTitle`, `model` e `info`" },
                 { status: 400 }
             );
         }
@@ -76,9 +77,10 @@ export async function POST(request: NextRequest) {
         }
         await session.commitTransaction();
 
-        // 7) Crear documento con título
+        // 7) Crear documento con título y modelTitle
         const doc = await GeneratedDocument.create({
             title,
+            modelTitle,    // nuevo campo
             userUid: uid,
             model,
             info,

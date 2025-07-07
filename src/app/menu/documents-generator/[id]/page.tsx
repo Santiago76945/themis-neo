@@ -15,9 +15,7 @@ import {
 } from "@/lib/apiClient";
 
 export default function DocumentDetailPage() {
-    // Extraer ID de la ruta usando useParams
-    const params = useParams();
-    const id = params.id as string;
+    const { id } = useParams() as { id: string };
     const router = useRouter();
     const { user, coinsBalance, refreshCoins } = useAuth();
 
@@ -25,6 +23,7 @@ export default function DocumentDetailPage() {
     const [error, setError] = useState<string>("");
     const [isPurchaseModalOpen, setPurchaseModalOpen] = useState(false);
     const [isProcessingDelete, setProcessingDelete] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -38,7 +37,6 @@ export default function DocumentDetailPage() {
         })();
     }, [user, id]);
 
-    // Mientras carga
     if (!doc && !error) {
         return (
             <div className={`container ${styles.pageContainer}`}>
@@ -46,8 +44,6 @@ export default function DocumentDetailPage() {
             </div>
         );
     }
-
-    // Si hay error
     if (error) {
         return (
             <div className={`container ${styles.pageContainer}`}>
@@ -59,7 +55,6 @@ export default function DocumentDetailPage() {
         );
     }
 
-    // A estas alturas `doc` ya no es null
     const document = doc!;
 
     const handleDelete = async () => {
@@ -73,6 +68,19 @@ export default function DocumentDetailPage() {
             setError(e.message || "No se pudo eliminar");
         } finally {
             setProcessingDelete(false);
+        }
+    };
+
+    const handleCopy = async () => {
+        const textToCopy = `${document.modelTitle}\n\n${document.content
+            .split("\n")
+            .join(" ")}`;
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // opcional: manejar error de copia
         }
     };
 
@@ -95,31 +103,35 @@ export default function DocumentDetailPage() {
                 />
 
                 <div className={styles.content}>
-                    {/* Acá mostramos el título del documento */}
-                    <h1 className={styles.mainTitle}>{document.title}</h1>
+                    {/* Título del modelo */}
+                    <h1 className={styles.mainTitle}>
+                        {document.modelTitle}
+                    </h1>
 
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Modelo</h2>
-                        <p>{document.model}</p>
-                    </section>
+                    {/* Cuerpo en un solo párrafo */}
+                    <div className="prose my-4">
+                        <p className={styles.documentBodyText}>
+                            {document.content.split("\n").join(" ")}
+                        </p>
+                    </div>
 
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Información personalizada</h2>
-                        <p>{document.info}</p>
-                    </section>
+                    {/* Botón Copiar */}
+                    <button
+                        className={`btn ${styles.actionButton}`}
+                        onClick={handleCopy}
+                        disabled={copied}
+                    >
+                        {copied ? "¡Copiado!" : "Copiar texto"}
+                    </button>
 
-                    <section className={styles.section}>
-                        <h2 className={styles.sectionTitle}>Contenido generado</h2>
-                        {document.content.split("\n").map((line, idx) => (
-                            <p key={idx}>{line}</p>
-                        ))}
-                    </section>
-
-                    <section className={styles.section}>
-                        <span>
-                            Creado el {new Date(document.createdAt).toLocaleString()}
-                        </span>
-                    </section>
+                    {/* Fecha y coste */}
+                    <p className={styles.listItemDate}>
+                        Creado el{" "}
+                        {new Date(document.createdAt).toLocaleString()}
+                    </p>
+                    <p className={styles.listItemDate}>
+                        ThemiCoins consumidos: {document.coinsCost}
+                    </p>
 
                     <div className={styles.footer}>
                         <button className="btn" onClick={() => router.back()}>

@@ -91,11 +91,13 @@ export const getDocumentModels = (): Promise<DocumentModel[]> =>
 export interface DocumentData {
     _id: string;
     userUid: string;
-    title: string;       // ← agregado
+    title: string;
+    modelTitle: string;
     model: string;
     info: string;
     content: string;
     tokens: number;
+    totalTokens: number;
     coinsCost: number;
     createdAt: string;
     updatedAt: string;
@@ -104,12 +106,12 @@ export interface DocumentData {
 export const getDocuments = (): Promise<DocumentData[]> =>
     fetchWithAuth("/api/documents");
 
-// --- Obtener un solo documento por ID ---
 export const getDocument = (id: string): Promise<DocumentData> =>
     fetchWithAuth(`/api/documents/${id}`);
 
 export const postDocument = (body: {
-    title: string;       // ← ahora incluye title
+    title: string;
+    modelTitle: string;
     model: string;
     info: string;
 }): Promise<DocumentData> =>

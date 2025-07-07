@@ -1,107 +1,118 @@
+## 📝 Documentos generados con IA – Backend (versión 2025-07-07)
+
+### 📄 Formato de los modelos (`/api/document-models`)
+
+Cada plantilla – almacenada estáticamente como JSON en el servidor – tiene **tres** claves.
+Ejemplo real ⬇️
+
+```jsonc
+{
+  "title": "Recibo de pago",           // encabezado legal que irá al comienzo del documento
+  "content": "En la ciudad de Córdoba, …", // cuerpo con campos entre corchetes [ ] para sustituir
+  "recommendation": "Proveer al menos: …"  // ayuda que el UI muestra como *placeholder*
+}
+```
+
+| Clave            | Para qué se usa en el cliente                                                       |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| `title`          | • Aparece como **modelTitle** en el popup/vista detallada.<br>• Se guarda en Mongo. |
+| `content`        | Texto base que se envía a GPT-4o junto con los datos personalizados (`info`).       |
+| `recommendation` | Se muestra como placeholder para guiar al abogado sobre la información a rellenar.  |
+
+> **Nota:** el nombre del archivo que el usuario elige (`title` en la petición POST) **no** tiene que coincidir con `modelTitle`; normalmente contendrá detalles para ubicar el caso, por ejemplo *“Martínez c/ Pérez – Recibo”*.
 
 ---
-## 📝 Documentos generados con IA – Backend
 
 ### 🛣️ Flujo completo
 
-1. **POST `/api/documents`**  
-   * **Autenticación**: se verifica el `idToken` con Firebase Admin.  
-   * **Entrada**: `{ title, model, info }`.  
-   * **OpenAI**: `generateDocument(model, info)` llama a GPT 3.5/4 para crear el texto.  
-   * **Tokens & coste**: se calcula `coinsCost = Math.ceil(tokens * COINS_PER_TOKEN)`.  
-   * **MongoDB (transacción)**  
-     1. Comprueba que `user.coinsBalance ≥ coinsCost`.  
-     2. Resta `coinsCost` de forma atómica.  
-     3. Guarda el documento en la colección `generateddocuments`.  
-   * **Respuesta**: documento completo (incluye `title`, `content`, `tokens`, `coinsCost`).
+1. **POST `/api/documents`**
 
-2. **GET `/api/documents`**  
-   * Devuelve **solo** los documentos del usuario (`uid`) con campos:  
-     `title, model, info, content, tokens, coinsCost, createdAt`.
+   ```jsonc
+   {               // body esperado
+     "title":      "Martínez – Recibo",  // nombre que verá solo el usuario en su lista
+     "modelTitle": "Recibo de pago",     // encabezado legal (viene del modelo JSON)
+     "model":      "En la ciudad de …",  // plantilla completa
+     "info":       "Lugar: Santa Fe …"   // datos reales para completar la plantilla
+   }
+   ```
 
-3. **GET `/api/documents/[id]`**  
-   * Devuelve un documento concreto si pertenece al usuario.
+   * **Auth** → `idToken` ↦ `uid`.
+   * **OpenAI** → GPT-4o genera `content`.
+   * **Coste** → `totalTokens = usage.total_tokens`;
+     `coinsCost = Math.ceil(totalTokens * COINS_PER_TOKEN)`.
+   * **Transacción Mongo** → comprueba saldo, descuenta y guarda.
+   * **Respuesta** → documento con `title`, `modelTitle`, `content`, `tokens`, `totalTokens`, `coinsCost`, fechas, etc.
 
-4. **DELETE `/api/documents/[id]`**  
-   * Elimina el documento si el `uid` coincide y actualiza la lista en el cliente.
+2. **GET `/api/documents`**
+
+   * Devuelve lista filtrada por `uid`:
+     `title, modelTitle, coinsCost, createdAt, …`
+
+3. **GET `/api/documents/[id]`**
+
+   * Devuelve el documento completo si pertenece al usuario.
+
+4. **DELETE `/api/documents/[id]`**
+
+   * Borra el documento y devuelve `{ success:true }`.
 
 ---
 
-### 🔑 Esquema de `GeneratedDocument` (MongoDB)
+### 🔑 Esquema `GeneratedDocument`
 
 ```ts
-// src/lib/models/Document.ts
 {
-  title:      { type: String, required: true },
-  userUid:    { type: String, required: true, index: true },
-  model:      { type: String, required: true },   // prompt base
-  info:       { type: String, required: true },   // datos del usuario
-  content:    { type: String, default: '' },      // texto generado
-  tokens:     { type: Number, default: 0 },
-  coinsCost:  { type: Number, required: true },
-  createdAt:  Date,                               // timestamps:true
-  updatedAt:  Date
+  title:       String,   // nombre que puso el usuario
+  modelTitle:  String,   // encabezado legal de la plantilla
+  userUid:     String,
+  model:       String,   // plantilla original
+  info:        String,   // datos personalizados
+  content:     String,   // texto final
+  tokens:      Number,   // solo completion
+  totalTokens: Number,   // prompt + completion
+  coinsCost:   Number,
+  createdAt:   Date,
+  updatedAt:   Date
 }
-````
+```
 
 ---
 
 ### 🔧 Archivos clave
 
-| Ruta                                      | Propósito                                                  |
-| ----------------------------------------- | ---------------------------------------------------------- |
-| **`src/app/api/documents/route.ts`**      | `POST` (crear) y `GET` (listar) documentos                 |
-| **`src/app/api/documents/[id]/route.ts`** | `GET` (detalle) y `DELETE` documento                       |
-| **`src/lib/models/Document.ts`**          | Esquema Mongoose de `GeneratedDocument`                    |
-| **`src/lib/generateDocument.ts`**         | Llama a OpenAI, cuenta tokens y calcula `coinsCost`        |
-| **`src/lib/db.ts`**                       | Conexión global a MongoDB                                  |
-| **`src/lib/firebaseAdmin.ts`**            | Verificación de tokens Firebase                            |
-| **`src/lib/apiClient.ts`**                | Funciones `getDocuments`, `postDocument`, `deleteDocument` |
-
----
-
-### 🔐 Autenticación
-
-Todas las rutas `/api/documents*` exigen:
-
-```
-Authorization: Bearer <ID_TOKEN_FIREBASE>
-```
-
-* Verificado con `admin.auth().verifyIdToken`.
-* Extrae `uid` para filtrar/crear/eliminar documentos solo del propietario.
+| Ruta                                             | Descripción breve                                    |
+| ------------------------------------------------ | ---------------------------------------------------- |
+| `src/app/api/documents/route.ts`                 | POST/GET documentos                                  |
+| `src/app/api/documents/[id]/route.ts`            | GET/DELETE documento                                 |
+| `src/lib/models/Document.ts`                     | Esquema Mongoose                                     |
+| `src/lib/generateDocument.ts`                    | Llama a GPT-4o y calcula coste                       |
+| `src/app/menu/documents-generator/page.tsx`      | UI principal (crear, lista, popup, **copiar texto**) |
+| `src/app/menu/documents-generator/[id]/page.tsx` | Vista detallada (copiar/eliminar)                    |
+| `src/lib/apiClient.ts`                           | Fetch helper con token                               |
 
 ---
 
 ### 💸 Cálculo de coste
 
-| Concepto         | Fórmula                                           | Variable          |
-| ---------------- | ------------------------------------------------- | ----------------- |
-| **Coste por IA** | `coinsCost = Math.ceil(tokens * COINS_PER_TOKEN)` | `COINS_PER_TOKEN` |
+| Concepto | Fórmula                                                |
+| -------- | ------------------------------------------------------ |
+| Coste IA | `coinsCost = Math.ceil(totalTokens * COINS_PER_TOKEN)` |
 
-> Ejemplo: 68 tokens, `COINS_PER_TOKEN = 0.04` → `68 × 0.04 = 2.72` → `coinsCost = 3`.
-
-La transacción resta el saldo **antes** de guardar el documento; si el usuario no tiene monedas suficientes, responde `402 Payment Required`.
+Ejemplo → `totalTokens = 72`, `COINS_PER_TOKEN = 0 .04` → `coinsCost = 3`.
 
 ---
 
-### 🖇️ Integración en el cliente
+### 🖇️ Integración front-end
 
-* **Crear**:
+```ts
+// crear
+await postDocument({ title, modelTitle, model, info });
 
-  ```ts
-  await postDocument({ title, model, info });
-  ```
-* **Listar** (pestaña *Crear escrito*):
+// listar
+const docs = await getDocuments(); // título, fecha, coinsCost …
 
-  ```ts
-  const docs = await getDocuments(); // muestra título y fecha
-  ```
-* **Detalle**:
-  La página `[id]/page.tsx` llama `GET /api/documents/[id]` y renderiza:
-
-  * `content` completo
-  * `tokens` y `coinsCost`
-  * Botón **Eliminar** (`DELETE /api/documents/[id]`)
-
----
+// detalle
+//   • muestra modelTitle + content
+//   • botón “Copiar texto” (clipboard)
+//   • botón “Eliminar”
+```

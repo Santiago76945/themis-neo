@@ -17,10 +17,19 @@ export async function GET(
         const { id } = params;
         await connectToDatabase();
 
-        // Incluir title en la proyección
+        // Incluir modelTitle en la proyección
         const doc = await GeneratedDocument.findOne(
             { _id: id, userUid: uid },
-            { title: 1, model: 1, info: 1, content: 1, tokens: 1, coinsCost: 1, createdAt: 1 }
+            {
+                title: 1,
+                modelTitle: 1,  // ← añadido
+                model: 1,
+                info: 1,
+                content: 1,
+                tokens: 1,
+                coinsCost: 1,
+                createdAt: 1,
+            }
         );
         if (!doc) {
             return NextResponse.json(
