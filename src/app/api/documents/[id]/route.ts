@@ -5,17 +5,13 @@ import { verifyIdToken } from "@/lib/firebaseAdmin";
 import { connectToDatabase } from "@/lib/db";
 import GeneratedDocument from "@/lib/models/Document";
 
-// Contexto tipado para rutas dinámicas
-interface Context {
-    params: { id: string };
-}
-
 // GET: Obtiene un documento por ID para el usuario autenticado
 export async function GET(
     request: NextRequest,
-    { params }: Context
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = params;
+    const { id } = await params;
+
     try {
         const authHeader = request.headers.get("authorization") || "";
         const token = authHeader.replace("Bearer ", "");
@@ -58,9 +54,10 @@ export async function GET(
 // DELETE: Elimina un documento por ID para el usuario autenticado
 export async function DELETE(
     request: NextRequest,
-    { params }: Context
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const { id } = params;
+    const { id } = await params;
+
     try {
         const authHeader = request.headers.get("authorization") || "";
         const token = authHeader.replace("Bearer ", "");
