@@ -85,3 +85,5 @@ THEMIS-NEO
 ├─ next.config.ts
 ├─ package.json
 └─ README.md
+
+//before implementing docx generator
