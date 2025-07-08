@@ -39,6 +39,19 @@ export default function MenuPage() {
             path: "/menu/documents-generator",
             enabled: true
         },
+                {
+            label: "Certificación digital de firmas",
+            icon: "/icons/signature-icon.png",
+            path: "/menu/documents-generator",
+            enabled: false
+        },
+                {
+            label: "Themis AI - Asistente personal",
+            icon: "/icons/themis-icon.png",
+            path: "/menu/documents-generator",
+            enabled: false
+        },
+        
         { label: "Gestión de clientes", icon: "/icons/clients-icon.png", path: "/menu/clientes", enabled: false },
         { label: "Gestión de casos", icon: "/icons/court-file-icon.png", path: "/menu/casos", enabled: false },
         { label: "Gestión de tareas", icon: "/icons/tasks-icon.png", path: "/menu/tasks", enabled: false },
