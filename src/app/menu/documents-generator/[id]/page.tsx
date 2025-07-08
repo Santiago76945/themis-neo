@@ -8,7 +8,6 @@ import { useAuth } from "@/context/AuthContext";
 import Toolbar from "@/components/Toolbar";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
 import DocxDownloadButton from "@/components/DocxDownloadButton";
-import { TEMPLATE_BASE64 } from "@/assets/templateBase64";
 import styles from "@/components/styles/DocumentsGenerator.module.css";
 import {
     getDocument,
@@ -125,10 +124,9 @@ export default function DocumentDetailPage() {
                             {copied ? "¡Copiado!" : "Copiar texto"}
                         </button>
                         <DocxDownloadButton
-                            title={document.title}
+                            documentTitle={document.modelTitle}
                             body={document.content}
-                            backgroundImageBase64={TEMPLATE_BASE64}
-                            outputFilename={`${document.title}.docx`}
+                            fileName={document.title}
                         />
                     </div>
 

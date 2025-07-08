@@ -196,10 +196,9 @@ export default function DocumentsGeneratorPage() {
 
                         {/* Botón de descargar .docx */}
                         <DocxDownloadButton
-                            title={popupDoc.title}
+                            documentTitle={popupDoc.modelTitle}
                             body={popupDoc.content}
-                            backgroundImageBase64={TEMPLATE_BASE64}
-                            outputFilename={`${popupDoc.title}.docx`}
+                            fileName={popupDoc.title}
                         />
                     </div>
 

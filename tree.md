@@ -1,11 +1,12 @@
 THEMIS-NEO
 ├─ public
-│  └─ images
-│     ├─ coins-basic.png
-│     ├─ coins-popular.png
-│     ├─ coins-premium.png
-│     └─ mercadopago.svg
-│     └─ … (más iconos e imágenes)
+│  ├─ images
+│  │  ├─ coins-basic.png
+│  │  ├─ coins-popular.png
+│  │  ├─ coins-premium.png
+│  │  └─ mercadopago.svg
+│  │  └─ … (más iconos e imágenes)
+│  └─ template.docx                      # NUEVO (plantilla Word)
 │
 ├─ src
 │  ├─ app
@@ -16,10 +17,10 @@ THEMIS-NEO
 │  │  │  ├─ webhook/route.ts
 │  │  │  ├─ transcriptions/route.ts
 │  │  │  ├─ transcriptions/[id]/route.ts
-│  │  │  ├─ documents/route.ts              ← POST & GET documentos
-│  │  │  ├─ documents/[id]/route.ts         ← GET & DELETE por ID
-│  │  │  ├─ document-models/route.ts        ← lista modelos JSON
-│  │  │  └─ documents-generator/[id]/route.ts  (legacy: open single doc)
+│  │  │  ├─ documents/route.ts              # POST & GET documentos
+│  │  │  ├─ documents/[id]/route.ts         # GET & DELETE por ID
+│  │  │  ├─ document-models/route.ts        # lista modelos JSON
+│  │  │  └─ documents-generator/[id]/route.ts  (legacy)
 │  │  │
 │  │  ├─ login/page.tsx
 │  │  ├─ menu
@@ -28,12 +29,15 @@ THEMIS-NEO
 │  │  │  │  ├─ page.tsx
 │  │  │  │  └─ [id]/page.tsx
 │  │  │  └─ documents-generator
-│  │  │     ├─ page.tsx                     ← lista + crear documentos
-│  │  │     └─ [id]/page.tsx                ← detalle de un documento
+│  │  │     ├─ page.tsx                     # lista + crear documentos
+│  │  │     └─ [id]/page.tsx                # detalle de un documento
 │  │  │
 │  │  ├─ success.tsx
 │  │  ├─ layout.tsx
 │  │  └─ page.tsx
+│  │
+│  ├─ assets
+│  │  └─ templateBase64.ts                 # NUEVO (opcional base-64)
 │  │
 │  ├─ components
 │  │  ├─ Toolbar.tsx
@@ -42,13 +46,14 @@ THEMIS-NEO
 │  │  ├─ CheckoutButton.tsx
 │  │  ├─ ConsoleEffect.tsx
 │  │  ├─ ConsoleEffectWrapper.tsx
+│  │  ├─ DocxDownloadButton.tsx            # NUEVO (descarga .docx)
 │  │  └─ styles
 │  │     ├─ AudioTranscription.module.css
 │  │     ├─ CoinPurchaseModal.module.css
 │  │     ├─ Popup.module.css
 │  │     ├─ DocumentsGenerator.module.css
 │  │     ├─ Menu.module.css
-│  │     ├─ … (resto de .css)
+│  │     └─ … (resto .css)
 │  │
 │  ├─ context
 │  │  └─ AuthContext.tsx
@@ -63,27 +68,27 @@ THEMIS-NEO
 │  │  ├─ models
 │  │  │  ├─ User.ts
 │  │  │  ├─ Transcription.ts
-│  │  │  └─ Document.ts                    ← esquema GeneratedDocument
+│  │  │  └─ Document.ts                    # esquema GeneratedDocument
 │  │  ├─ apiClient.ts
 │  │  ├─ db.ts
 │  │  ├─ firebase.ts
 │  │  ├─ firebaseAdmin.ts
 │  │  ├─ uploadToFirebase.ts
-│  │  └─ generateDocument.ts              ← GPT-4o + coste tokens
+│  │  └─ generateDocument.ts               # GPT-4o + coste tokens
 │  │
 │  ├─ server
 │  │  └─ mercadoPago.ts
 │  │
 │  ├─ utils
-│  │  └─ generateCode.ts
+│  │  ├─ generateCode.ts
+│  │  └─ generateDoc.ts                    # NUEVO (Docxtemplater → Blob)
 │  │
 │  └─ hooks / servicios / … (otros helpers)
 │
-├─ .env            (IGNORADO en git)
+├─ .env
 ├─ .gitignore
 ├─ tsconfig.json
 ├─ next.config.ts
 ├─ package.json
 └─ README.md
 
-//before implementing docx generator

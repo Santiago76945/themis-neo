@@ -1,28 +1,32 @@
-// components/DocxDownloadButton.tsx
+// src/components/DocxDownloadButton.tsx
 
 import React, { useState } from "react";
 import { saveAs } from "file-saver";
 import { generateDocFromJSON } from "@/utils/generateDoc";
 
 interface DownloadButtonProps {
-    title: string;
+    /** Texto del título dentro del documento (título del modelo) */
+    documentTitle: string;
+    /** Cuerpo del documento */
     body: string;
-    outputFilename?: string;
+    /** Nombre de archivo .docx (sin extensión) */
+    fileName?: string;
 }
 
 export default function DocxDownloadButton({
-    title,
+    documentTitle,
     body,
-    outputFilename,
+    fileName,
 }: DownloadButtonProps) {
     const [loading, setLoading] = useState(false);
-    const filename = outputFilename || `${title}.docx`;
+    const fileNameWithExt = `${fileName ?? documentTitle}.docx`;
 
     const handleDownload = async () => {
         setLoading(true);
         try {
-            const blob = await generateDocFromJSON({ title, body });
-            saveAs(blob, filename);
+            // Ahora pasamos documentTitle (no title) para coincidir con generateDocFromJSON
+            const blob = await generateDocFromJSON({ documentTitle, body });
+            saveAs(blob, fileNameWithExt);
         } catch (err) {
             console.error("Error al generar docx:", err);
         } finally {

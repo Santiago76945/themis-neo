@@ -4,19 +4,20 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 
 export interface DocOptions {
-    title: string;
+    /**
+     * El título interno que irá al marcador <<title>> de la plantilla
+     */
+    documentTitle: string;
+    /**
+     * Cuerpo del documento para el marcador <<body>>
+     */
     body: string;
-    outputFilename?: string;
 }
 
-/**
- * Genera un .docx basado en una plantilla usando Docxtemplater.
- * La plantilla debe estar en `public/template.docx` y usar <<title>> y <<body>>.
- */
 export async function generateDocFromJSON(opts: DocOptions): Promise<Blob> {
-    const { title, body } = opts;
+    const { documentTitle, body } = opts;
 
-    // 1) Cargar la plantilla desde public/
+    // 1) Cargar la plantilla desde public/template.docx
     const res = await fetch("/template.docx");
     if (!res.ok) {
         throw new Error("No se pudo cargar la plantilla template.docx");
@@ -34,7 +35,8 @@ export async function generateDocFromJSON(opts: DocOptions): Promise<Blob> {
     });
 
     // 4) Inyectar los datos
-    doc.setData({ title, body });
+    //    Incluimos tanto 'title' como 'documentTitle' por si la plantilla usa uno u otro
+    doc.setData({ title: documentTitle, documentTitle, body });
 
     try {
         // 5) Renderizar la plantilla
