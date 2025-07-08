@@ -8,6 +8,8 @@ import { useAuth } from "@/context/AuthContext";
 import Toolbar from "@/components/Toolbar";
 import Popup from "@/components/Popup";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
+import DocxDownloadButton from "@/components/DocxDownloadButton";
+import { TEMPLATE_BASE64 } from "@/assets/templateBase64";
 import styles from "@/components/styles/DocumentsGenerator.module.css";
 import {
     getDocuments,
@@ -181,17 +183,25 @@ export default function DocumentsGeneratorPage() {
                         <p>{popupDoc.content.split("\n").join(" ")}</p>
                     </div>
 
-                    {/* Espacio antes de acciones */}
-                    <div className="my-4" />
+                    {/* Botones de acción: copiar y descargar */}
+                    <div className="flex gap-2 my-4">
+                        {/* Botón de copiar con feedback */}
+                        <button
+                            className={`btn ${styles.modalButton}`}
+                            onClick={handleCopy}
+                            disabled={copied}
+                        >
+                            {copied ? "¡Copiado!" : "Copiar texto"}
+                        </button>
 
-                    {/* Botón de copiar con feedback */}
-                    <button
-                        className={`btn ${styles.modalButton}`}
-                        onClick={handleCopy}
-                        disabled={copied}
-                    >
-                        {copied ? "¡Copiado!" : "Copiar texto"}
-                    </button>
+                        {/* Botón de descargar .docx */}
+                        <DocxDownloadButton
+                            title={popupDoc.title}
+                            body={popupDoc.content}
+                            backgroundImageBase64={TEMPLATE_BASE64}
+                            outputFilename={`${popupDoc.title}.docx`}
+                        />
+                    </div>
 
                     {/* Fecha y coste */}
                     <p className={styles.listItemDate}>

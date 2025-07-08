@@ -7,6 +7,8 @@ import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Toolbar from "@/components/Toolbar";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
+import DocxDownloadButton from "@/components/DocxDownloadButton";
+import { TEMPLATE_BASE64 } from "@/assets/templateBase64";
 import styles from "@/components/styles/DocumentsGenerator.module.css";
 import {
     getDocument,
@@ -104,9 +106,7 @@ export default function DocumentDetailPage() {
 
                 <div className={styles.content}>
                     {/* Título del modelo */}
-                    <h1 className={styles.mainTitle}>
-                        {document.modelTitle}
-                    </h1>
+                    <h1 className={styles.mainTitle}>{document.modelTitle}</h1>
 
                     {/* Cuerpo en un solo párrafo */}
                     <div className="prose my-4">
@@ -115,19 +115,26 @@ export default function DocumentDetailPage() {
                         </p>
                     </div>
 
-                    {/* Botón Copiar */}
-                    <button
-                        className={`btn ${styles.actionButton}`}
-                        onClick={handleCopy}
-                        disabled={copied}
-                    >
-                        {copied ? "¡Copiado!" : "Copiar texto"}
-                    </button>
+                    {/* Botones de acción: copiar y descargar */}
+                    <div className="flex gap-2 my-4">
+                        <button
+                            className={`btn ${styles.actionButton}`}
+                            onClick={handleCopy}
+                            disabled={copied}
+                        >
+                            {copied ? "¡Copiado!" : "Copiar texto"}
+                        </button>
+                        <DocxDownloadButton
+                            title={document.title}
+                            body={document.content}
+                            backgroundImageBase64={TEMPLATE_BASE64}
+                            outputFilename={`${document.title}.docx`}
+                        />
+                    </div>
 
                     {/* Fecha y coste */}
                     <p className={styles.listItemDate}>
-                        Creado el{" "}
-                        {new Date(document.createdAt).toLocaleString()}
+                        Creado el {new Date(document.createdAt).toLocaleString()}
                     </p>
                     <p className={styles.listItemDate}>
                         ThemiCoins consumidos: {document.coinsCost}
