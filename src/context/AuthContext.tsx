@@ -11,39 +11,53 @@ import {
     User as FirebaseUser,
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
-import { getCoinsBalance, purchaseCoins } from "@/lib/apiClient";
+import { getCoinsBalance, purchaseCoins, spendCoins as apiSpendCoins } from "@/lib/apiClient";
 
 interface AuthContextProps {
     user: FirebaseUser | null;
     uniqueCode: string | null;
     coinsBalance: number;
+    coinsPerToken: number;
+    coinsPerMb: number;
+    coinsPerMbStorage: number;
     signInWithGoogle: () => Promise<void>;
     signOut: () => Promise<void>;
     refreshCoins: () => Promise<void>;
     buyCoins: (amount: number) => Promise<void>;
+    spendCoins: (amount: number) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
     user: null,
     uniqueCode: null,
     coinsBalance: 0,
-    signInWithGoogle: async () => { },
-    signOut: async () => { },
-    refreshCoins: async () => { },
-    buyCoins: async () => { },
+    coinsPerToken: 0,
+    coinsPerMb: parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB || "0"),
+    coinsPerMbStorage: parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB_STORAGE || "0"),
+    signInWithGoogle: async () => {},
+    signOut: async () => {},
+    refreshCoins: async () => {},
+    buyCoins: async () => {},
+    spendCoins: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<FirebaseUser | null>(null);
     const [uniqueCode, setUniqueCode] = useState<string | null>(null);
     const [coinsBalance, setCoinsBalance] = useState<number>(0);
+    const [coinsPerToken, setCoinsPerToken] = useState<number>(0);
 
-    // Obtener saldo de ThemiCoins
+    // Tarifas por MB
+    const coinsPerMb = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB || "0");
+    const coinsPerMbStorage = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB_STORAGE || "0");
+
+    // Obtener saldo y tarifa de tokens
     const refreshCoins = async () => {
         if (!user) return;
         try {
-            const { coins } = await getCoinsBalance();
+            const { coins, coinsPerToken: tokenRate } = await getCoinsBalance();
             setCoinsBalance(coins);
+            setCoinsPerToken(tokenRate);
         } catch (err) {
             console.error("Error cargando saldo de ThemiCoins:", err);
         }
@@ -53,10 +67,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const buyCoins = async (amount: number) => {
         if (!user) throw new Error("No autorizado");
         try {
-            const { coins } = await purchaseCoins(amount);
+            const { coins, coinsPerToken: tokenRate } = await purchaseCoins(amount);
             setCoinsBalance(coins);
+            setCoinsPerToken(tokenRate);
         } catch (err) {
             console.error("Error comprando ThemiCoins:", err);
+            throw err;
+        }
+    };
+
+    // Gastar (descontar) coins y actualizar saldo
+    const spendCoins = async (amount: number) => {
+        if (!user) throw new Error("No autorizado");
+        try {
+            await apiSpendCoins(amount);
+            await refreshCoins();
+        } catch (err) {
+            console.error("Error descontando ThemiCoins:", err);
             throw err;
         }
     };
@@ -68,11 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setUser(null);
                 setUniqueCode(null);
                 setCoinsBalance(0);
+                setCoinsPerToken(0);
                 return;
             }
             setUser(fbUser);
 
-            // 1) Perfil de usuario
+            // 1) Crear/leer perfil
             try {
                 const token = await fbUser.getIdToken();
                 const res = await fetch("/api/createUserProfile", {
@@ -89,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 console.error("Error en createUserProfile:", err);
             }
 
-            // 2) Cargar saldo de coins
+            // 2) Cargar saldo y tarifas
             await refreshCoins();
         });
 
@@ -100,7 +128,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider);
-        // El onAuthStateChanged manejará el resto
     };
 
     const signOut = async () => {
@@ -114,10 +141,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user,
                 uniqueCode,
                 coinsBalance,
+                coinsPerToken,
+                coinsPerMb,
+                coinsPerMbStorage,
                 signInWithGoogle,
                 signOut,
                 refreshCoins,
                 buyCoins,
+                spendCoins,
             }}
         >
             {children}

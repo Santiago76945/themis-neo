@@ -42,8 +42,8 @@ export default function MenuPage() {
                 {
             label: "Certificación digital de firmas",
             icon: "/icons/signature-icon.png",
-            path: "/menu/documents-generator",
-            enabled: false
+            path: "/menu/signature-verification",
+            enabled: true
         },
                 {
             label: "Themis AI - Asistente personal",

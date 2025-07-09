@@ -1,0 +1,402 @@
+/* src/components/styles/SignatureVerification.module.css */
+
+/* ==============================
+   Layout
+   ============================== */
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    text-align: center;
+}
+
+.cardWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 95vw;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    padding-top: var(--space-4);
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 var(--space-4) var(--space-4);
+    text-align: center;
+}
+
+/* ==============================
+   Wizard Container
+   ============================== */
+.wizardContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: var(--space-4);
+    gap: var(--space-3);
+    text-align: center;
+}
+
+/* ==============================
+   Typography
+   ============================== */
+.mainTitle {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent);
+    margin: 0 0 var(--space-3);
+}
+
+.stepIndicator {
+    font-size: var(--font-size-base);
+    margin: 0 0 var(--space-2);
+}
+
+.sectionTitle {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--space-2);
+}
+
+.helpText {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--color-on-surface);
+    margin: 0 0 var(--space-2);
+}
+
+.errorMessage {
+    font-size: var(--font-size-base);
+    color: #e63946;
+    margin: 0 0 var(--space-2);
+    text-align: center;
+}
+
+/* ==============================
+   Sections
+   ============================== */
+.section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    margin: 0 0 var(--space-3);
+    text-align: center;
+}
+
+/* ==============================
+   Labels & Inputs
+   ============================== */
+.section label {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent);
+    margin: 0 0 var(--space-1);
+    margin-bottom: 30px;
+}
+
+.section label.secondary {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-on-surface);
+}
+
+.section input,
+.section select,
+.section textarea {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    box-sizing: border-box;
+    margin: 0 0 var(--space-2);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section input::placeholder {
+    color: rgba(224, 224, 224, 0.6);
+}
+
+.section input:focus,
+.section select:focus,
+.section textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(247, 231, 206, 0.3);
+}
+
+/* ==============================
+   Preview Grid
+   ============================== */
+.previewGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+}
+
+.previewImage {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+}
+
+/* ==============================
+   Party Inputs
+   ============================== */
+.partyInput {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+}
+
+/* ==============================
+   Buttons
+   ============================== */
+.buttonGroup,
+.navButtons {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 600px;
+    margin: var(--space-3) auto 0;
+}
+
+.navButtons {
+    margin-top: auto;
+}
+
+.buttonGroup .btn,
+.navButtons .btn {
+    flex: none;
+}
+
+.actionButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: var(--space-3) auto;
+    padding: var(--space-2) 0;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.actionButton:hover {
+    transform: translateY(-1px);
+}
+
+.modalButton {
+    margin: var(--space-2) 0 var(--space-2);
+}
+
+/* ==============================
+   Tabs
+   ============================== */
+.tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: var(--space-2) 0;
+}
+
+.tabButton {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-2);
+    gap: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-surface);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.tabButton+.tabButton {
+    margin-left: var(--space-2);
+}
+
+.tabButton:hover {
+    background-color: var(--color-divider);
+    transform: translateY(-1px);
+}
+
+.tabButton.active {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+}
+
+/* Para ocultar los spinners en Chrome, Safari, Edge */
+.plainNumber::-webkit-outer-spin-button,
+.plainNumber::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Opcional: ajustar ancho/fuente para que se vea bien */
+.plainNumber {
+    width: 4em;
+    /* o el ancho que prefieras */
+    text-align: center;
+    /* centra el número dentro */
+    /* hereda padding, border y background de .section input */
+}
+
+/* Wrapper para controlar el input y los botones */
+.numberInputWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+/* Botones + y − */
+.decrementBtn,
+.incrementBtn {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-surface);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.decrementBtn:hover,
+.incrementBtn:hover {
+    background-color: var(--color-divider);
+}
+
+/* Ajustes al input numérico */
+.plainNumber {
+    width: 4rem;
+    text-align: center;
+}
+
+/* Botones + y − */
+.decrementBtn,
+.incrementBtn {
+    /* Elimina tamaños fijos */
+    width: auto;
+    height: auto;
+
+    /* Usa el mismo padding que los inputs */
+    padding: var(--space-2) var(--space-3);
+
+    /* Asegura que el tamaño incluya border y padding */
+    box-sizing: border-box;
+
+    /* Misma estética que los inputs */
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background-color: var(--color-surface);
+
+    /* Centra el texto y ajusta línea */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.decrementBtn:hover,
+.incrementBtn:hover {
+    background-color: var(--color-divider);
+}
+
+/* En el wrapper, quita margen de los inputs */
+.numberInputWrapper .plainNumber {
+    margin: 0;
+    /* elimina cualquier margin-bottom */
+    padding: var(--space-2) var(--space-3);
+    /* iguala el padding vertical y horizontal */
+    box-sizing: border-box;
+    /* asegúrate de incluir padding/border en el alto */
+    height: auto;
+    /* deja que el padding dicte la altura */
+}
+
+/* Indica estilos para el párrafo de formatos */
+.allowedFormats {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-on-surface-variant);
+}
+
+.compressBtn {
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-base);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-on-primary);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.compressBtn:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-on-surface);
+}
+
+/* Botones de grabación */
+.recordBtn,
+.stopBtn {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    border: none;
+    border-radius: 0.375rem;
+    padding: var(--space-2) var(--space-3);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.recordBtn:hover,
+.stopBtn:hover {
+    transform: translateY(-1px);
+}
+
+/* Indicador visual de grabación */
+.recordingIndicator {
+    margin-left: var(--space-2);
+    color: #e63946;
+    font-weight: var(--font-weight-bold);
+}
+
+/* Ajuste para el reproductor de audio */
+.audioPlayer {
+    margin-top: var(--space-2);
+    width: 100%;
+}
+

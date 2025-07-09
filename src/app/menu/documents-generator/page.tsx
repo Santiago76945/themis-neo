@@ -9,7 +9,6 @@ import Toolbar from "@/components/Toolbar";
 import Popup from "@/components/Popup";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
 import DocxDownloadButton from "@/components/DocxDownloadButton";
-import { TEMPLATE_BASE64 } from "@/assets/templateBase64";
 import styles from "@/components/styles/DocumentsGenerator.module.css";
 import {
     getDocuments,
