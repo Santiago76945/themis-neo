@@ -12,7 +12,7 @@
     text-align: center;
 }
 
-.cardWrapper {
+/* .cardWrapper {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -22,6 +22,19 @@
     overflow: hidden;
     border-radius: 0.5rem;
     padding-top: var(--space-4);
+} */
+
+.cardWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Esto le da el ancho a la card principal dentro del body */
+    width: 95vw;
+    max-width: 600px;
+    height: 85vh;
+    overflow: hidden;
+    /* Quité el borde y fondo extra para no alterar colores */
+    border-radius: 0.5rem;
 }
 
 .content {
