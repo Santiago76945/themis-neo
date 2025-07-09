@@ -78,3 +78,6 @@ coverage/
 
 # JetBrains
 *.iml
+
+# Firebase credentials
+firebase-service-account.json
