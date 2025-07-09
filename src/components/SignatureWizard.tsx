@@ -21,7 +21,11 @@ interface PartyData {
     ip?: string;           // IP o hostname desde donde firmaron
 }
 
-export default function SignatureWizard() {
+interface SignatureWizardProps {
+    onComplete?: (code: string) => void;
+}
+export default function SignatureWizard({ onComplete }: SignatureWizardProps) {
+
     const { user, coinsBalance, coinsPerMbStorage, spendCoins } = useAuth();
     const [step, setStep] = useState(1);
     const [pagesCount, setPagesCount] = useState(1);
@@ -168,20 +172,24 @@ export default function SignatureWizard() {
 
             // 8) Guardar en backend
             const saved = await postCertification({
-                code: generatedCode,
+                code: generatedCode,      // ó simplemente `code`
                 pdfUrl: uploadedPdfUrl,
                 hash: hashHex,
-                parties: enrichedParties,
+                parties: enrichedParties
             });
 
             // 9) Actualizar estado con resultado
             setCode(saved.code);
             setPdfUrl(uploadedPdfUrl);
             setHash(saved.hash);
+
+            // Notificamos al padre y luego avanzamos al paso 5
+            onComplete?.(saved.code);
         } catch (e: any) {
             setError(e.message);
         } finally {
             setLoading(false);
+            setStep(5);
         }
     };
 
@@ -191,7 +199,7 @@ export default function SignatureWizard() {
 
     return (
         <div className={styles.wizardContainer}>
-            <h1 className={styles.mainTitle}>Certificación de Firma</h1>
+            <h1 className={styles.mainTitle}>Certificación digital avanzada de firmas con seguridad criptográfica y biométrica.</h1>
             {error && <p className={styles.errorMessage}>{error}</p>}
             {/* Step indicator */}
             <div className={styles.stepIndicator}>Paso {step} de 5</div>
@@ -244,6 +252,7 @@ export default function SignatureWizard() {
                             onChange={e => setPartiesCount(Math.max(1, +e.target.value))}
                             className={styles.plainNumber}
                         />
+
                         <button
                             type="button"
                             className={styles.incrementBtn}
@@ -252,6 +261,10 @@ export default function SignatureWizard() {
                             +
                         </button>
                     </div>
+                    {/* ↓ Aquí insertas el detalle de coste ↓ */}
+                    <p className={styles.costInfo}>
+                        Costo por certificación: <strong>{coinsPerMbStorage} ThemiCoins</strong> por MB
+                    </p>
                 </div>
             )}
 
@@ -280,7 +293,7 @@ export default function SignatureWizard() {
                             )
                         }
                     >
-                        Si tus imágenes exceden el peso máximo, <u>click aquí</u>
+                        Si tus imágenes exceden el peso máximo, <u>comprimelas aquí</u>
                     </button>
 
                     <input
@@ -345,6 +358,19 @@ export default function SignatureWizard() {
                             />
                         </div>
                     ))}
+                    <button
+                        type="button"
+                        className={styles.compressBtn}
+                        onClick={() =>
+                            window.open(
+                                "https://www.iloveimg.com/compress-image",
+                                "_blank",
+                                "noopener noreferrer"
+                            )
+                        }
+                    >
+                        Si tus imágenes exceden el peso máximo, <u>comprimelas aquí</u>
+                    </button>
                 </div>
             )}
 
@@ -356,7 +382,7 @@ export default function SignatureWizard() {
                             <p>Firmante {i + 1}:</p>
                             {/* Instrucción de lectura con el código generado */}
                             <p className={styles.readAloudText}>
-                                “Yo <strong>{p.name} {p.dni}</strong>, en este acto y a la fecha de hoy,
+                                “Yo <strong>{p.name} D.N.I. número {p.dni}</strong>, en este acto y a la fecha de hoy,
                                 reconozco la autenticidad de la firma autógrafa presente en el documento
                                 asociado a la clave de verificación <strong>{code}</strong>.”
                             </p>
@@ -420,7 +446,7 @@ export default function SignatureWizard() {
 
             {step === 5 && (
                 <div className={styles.section}>
-                    <p>Revisa los datos y confirma:</p>
+                    <p>Su certificado se está procesando. Por favor espere...</p>
                     {loading ? (
                         <p>Cargando...</p>
                     ) : pdfUrl ? (
@@ -428,9 +454,12 @@ export default function SignatureWizard() {
                             <p>
                                 Código generado: <strong>{code}</strong>
                             </p>
-                            <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-                                Ver certificado
-                            </a>
+                            <button
+                                className="btn"
+                                onClick={() => onComplete?.(code)}
+                            >
+                                Ver certificado completo
+                            </button>
                         </div>
                     ) : (
                         <button className="btn" onClick={handleNext}>

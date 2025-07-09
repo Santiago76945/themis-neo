@@ -45,6 +45,7 @@ export const deleteTranscription = (id: string): Promise<any> =>
 export interface CoinsBalance {
     coins: number;
     coinsPerToken: number;
+    coinsPerMbStorage: number;
 }
 
 export const getCoinsBalance = (): Promise<CoinsBalance> =>
@@ -56,6 +57,9 @@ export const purchaseCoins = (amount: number): Promise<CoinsBalance> =>
         body: JSON.stringify({ amount }),
     });
 
+/**
+ * Descuenta `amount` ThemiCoins (PATCH /api/coins)
+ */
 export const spendCoins = (amount: number): Promise<CoinsBalance> =>
     fetchWithAuth("/api/coins", {
         method: "PATCH",

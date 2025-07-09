@@ -27,7 +27,6 @@
 .content {
     flex: 1;
     overflow-y: auto;
-    padding: 0 var(--space-4) var(--space-4);
     text-align: center;
 }
 
@@ -398,5 +397,29 @@
 .audioPlayer {
     margin-top: var(--space-2);
     width: 100%;
+}
+
+/* Ajusta esta clase si la tienes con otro nombre */
+.idImage {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0.5rem auto;
+    object-fit: contain;
+}
+
+/* Evita que el texto de los párrafos desborde */
+.content p,
+.section p {
+    /* Permite partir palabras largas si es necesario */
+    overflow-wrap: break-word;
+    /* Para navegadores antiguos */
+    word-wrap: break-word;
+    /* Asegura que haya saltos de línea normales */
+    white-space: normal;
+}
+
+.content a {
+    margin-bottom: 20px;
 }
 

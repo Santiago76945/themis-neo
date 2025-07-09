@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Toolbar from "@/components/Toolbar";
 import CoinPurchaseModal from "@/components/CoinPurchaseModal";
 import SignatureWizard from "@/components/SignatureWizard";
@@ -36,12 +36,11 @@ export default function SignatureVerificationPage() {
     const [loadingCert, setLoadingCert] = useState(false);
     const [errorCert, setErrorCert] = useState<string | null>(null);
 
-    const handleConsult = async () => {
+    const handleConsult = useCallback(async () => {
         setErrorCert(null);
         setCert(null);
         setLoadingCert(true);
         try {
-            // Usamos helper con auth automática
             const data = await getCertification(codeQuery);
             setCert(data);
         } catch (err: any) {
@@ -53,7 +52,15 @@ export default function SignatureVerificationPage() {
         } finally {
             setLoadingCert(false);
         }
-    };
+    }, [codeQuery, getCertification]);
+
+    // … después de handleConsult:
+    useEffect(() => {
+        // Si estamos en pestaña "consult" y hay un código, lanzamos la búsqueda
+        if (view === "consult" && codeQuery.trim()) {
+            handleConsult();
+        }
+    }, [view, codeQuery]);
 
     return (
         <div className={`container ${styles.pageContainer}`}>
@@ -104,7 +111,13 @@ export default function SignatureVerificationPage() {
 
                 <div className={styles.content}>
                     {view === "create" ? (
-                        <SignatureWizard />
+                        <SignatureWizard
+                            onComplete={(generatedCode) => {
+                                setCodeQuery(generatedCode);
+                                setView("consult");
+                            }}
+                        />
+
                     ) : (
                         <section>
                             <h1 className={styles.mainTitle}>Consultar certificación</h1>

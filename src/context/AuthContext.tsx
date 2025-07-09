@@ -2,7 +2,7 @@
 
 "use client";
 
-import { ReactNode, useContext, createContext, useState, useEffect } from "react";
+import { ReactNode, useContext, createContext, useState, useEffect, useCallback } from "react";
 import {
     getAuth,
     signInWithPopup,
@@ -11,7 +11,11 @@ import {
     User as FirebaseUser,
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
-import { getCoinsBalance, purchaseCoins, spendCoins as apiSpendCoins } from "@/lib/apiClient";
+import {
+    getCoinsBalance,
+    purchaseCoins,
+    spendCoins as apiSpendCoins,
+} from "@/lib/apiClient";
 
 interface AuthContextProps {
     user: FirebaseUser | null;
@@ -52,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const coinsPerMbStorage = parseFloat(process.env.NEXT_PUBLIC_COINS_PER_MB_STORAGE || "0");
 
     // Obtener saldo y tarifa de tokens
-    const refreshCoins = async () => {
+    const refreshCoins = useCallback(async () => {
         if (!user) return;
         try {
             const { coins, coinsPerToken: tokenRate } = await getCoinsBalance();
@@ -61,10 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (err) {
             console.error("Error cargando saldo de ThemiCoins:", err);
         }
-    };
+    }, [user]);
 
     // Comprar coins y actualizar saldo
-    const buyCoins = async (amount: number) => {
+    const buyCoins = useCallback(async (amount: number) => {
         if (!user) throw new Error("No autorizado");
         try {
             const { coins, coinsPerToken: tokenRate } = await purchaseCoins(amount);
@@ -74,10 +78,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Error comprando ThemiCoins:", err);
             throw err;
         }
-    };
+    }, [user]);
 
     // Gastar (descontar) coins y actualizar saldo
-    const spendCoins = async (amount: number) => {
+    const spendCoins = useCallback(async (amount: number) => {
         if (!user) throw new Error("No autorizado");
         try {
             await apiSpendCoins(amount);
@@ -86,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Error descontando ThemiCoins:", err);
             throw err;
         }
-    };
+    }, [user, refreshCoins]);
 
     useEffect(() => {
         const auth = getAuth(app);
@@ -122,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [refreshCoins]);
 
     const signInWithGoogle = async () => {
         const auth = getAuth(app);
@@ -159,3 +163,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
     return useContext(AuthContext);
 }
+
