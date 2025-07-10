@@ -15,7 +15,7 @@
 }
 
 /* Espaciado interno entre hijos de la tarjeta */
-.card > * + * {
+.card>*+* {
   margin-top: var(--space-3);
 }
 
@@ -40,6 +40,7 @@
   color: var(--color-accent);
   text-shadow: 0 0 8px var(--color-accent);
 }
+
 .logoSubtitle {
   font-size: var(--font-size-lg);
   color: var(--color-on-surface);
@@ -64,6 +65,7 @@
   font-size: var(--font-size-base);
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
+
 .input:focus {
   outline: none;
   border-color: var(--color-accent);
@@ -88,6 +90,7 @@
   background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
   color: var(--color-accent);
 }
+
 .btnPrimary:hover {
   transform: translateY(-2px);
   background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
@@ -98,6 +101,7 @@
   background: linear-gradient(45deg, var(--gradient-end), var(--gradient-start));
   color: var(--color-accent);
 }
+
 .btnSecondary:hover {
   transform: translateY(-2px);
   background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
@@ -108,10 +112,12 @@
   background: linear-gradient(45deg, #3c3c3d, #4c4c4d);
   color: var(--color-accent);
 }
+
 .btnApple {
   background: linear-gradient(45deg, #101010, #202020);
   color: var(--color-accent);
 }
+
 .btnGoogle:hover,
 .btnApple:hover {
   transform: translateY(-2px);
@@ -134,6 +140,7 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
 .textLink:hover {
   color: var(--color-link-hover);
 }
@@ -159,10 +166,14 @@
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  height: 100%;       /* ajusta la altura para que ocupe todo el alto de la tarjeta */
-  width: auto;        /* mantiene la proporción */
-  object-fit: contain;/* en caso de que quieras controlar recortes */
-  z-index: 5;         /* detrás de los contenidos principales si los superpone */
+  height: 100%;
+  /* ajusta la altura para que ocupe todo el alto de la tarjeta */
+  width: auto;
+  /* mantiene la proporción */
+  object-fit: contain;
+  /* en caso de que quieras controlar recortes */
+  z-index: 5;
+  /* detrás de los contenidos principales si los superpone */
 }
 
 /* Mostrarla solo en pantallas anchas (≥1200px) */
@@ -195,7 +206,7 @@
   font-size: var(--font-size-base);
   color: var(--color-on-surface);
   line-height: 1.2;
-  line-height: 1.5;    
+  line-height: 1.5;
   width: 100%;
 }
 
@@ -219,24 +230,25 @@
 /* Sólo iOS Safari / WebKit móvil */
 @supports (-webkit-touch-callout: none) {
   .termsCheckbox input[type="checkbox"] {
-    /* Restauramos estilo nativo para que Safari dibuje el check en blanco */
+    /* Restauramos estilo nativo */
     -webkit-appearance: checkbox;
     appearance: checkbox;
 
-    /* Aseguramos fondo y borde para contraste */
+    /* Fondo y borde igual que antes */
     background-color: var(--color-surface);
     border: 2px solid var(--color-accent);
     border-radius: 4px;
+
+    /* Tilde con color oscuro */
+    accent-color: var(--color-surface);
 
     /* Tamaño consistente */
     width: 1.25rem;
     height: 1.25rem;
   }
 
-  /* Opcional: al marcarlo, cambiamos fondo para reforzar el contraste */
+  /* Si quieres además invertir fondo al marcar */
   .termsCheckbox input[type="checkbox"]:checked {
     background-color: var(--color-accent);
   }
 }
-
-
