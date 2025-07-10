@@ -5,47 +5,55 @@ import path from "path";
 import crypto from "crypto";
 import * as admin from "firebase-admin";
 
-// -- Parámetros de entorno --------------------------------
-const decryptKey = process.env.DECRYPT_KEY;                // p.ej. "12345678"
-const storageBucketName = process.env.FIREBASE_STORAGE_BUCKET; // "themis-971b4.appspot.com"
-
-if (!decryptKey) {
-    throw new Error("DECRYPT_KEY debe estar definido en las variables de entorno");
-}
-if (!storageBucketName) {
-    throw new Error(
-        "FIREBASE_STORAGE_BUCKET debe estar definido en las variables de entorno"
-    );
-}
-
-// -- Ruta al archivo cifrado ------------------------------
+const decryptKey = process.env.DECRYPT_KEY!;
+const storageBucketName = process.env.FIREBASE_STORAGE_BUCKET!;
 const ENC_PATH = path.join(process.cwd(), "serviceAccount.enc");
+
 if (!fs.existsSync(ENC_PATH)) {
     throw new Error(`No se encontró el archivo cifrado en ${ENC_PATH}`);
 }
 
-// -- Lectura y desencriptado ------------------------------
+// 1) Leer todo el buffer
 const encrypted = fs.readFileSync(ENC_PATH);
 
-// Deriva una clave de 32 bytes a partir de la passphrase numérica
-const key = crypto.scryptSync(decryptKey, "salt", 32);
+// 2) Validar y extraer salt
+const header = encrypted.slice(0, 8).toString("ascii");
+if (header !== "Salted__") {
+    throw new Error("Formato de fichero cifrado inválido");
+}
+const salt = encrypted.slice(8, 16);
 
-// OpenSSL pone la IV en los primeros 16 bytes del archivo
-const iv = encrypted.slice(0, 16);
+// 3) Derivar key+iv con PBKDF2 (misma iteración que usaste al cifrar)
+const ITERATIONS = 100_000;
+const KEY_LEN = 32;   // AES-256
+const IV_LEN = 16;    // CBC
+const keyIv = crypto.pbkdf2Sync(
+    decryptKey,
+    salt,
+    ITERATIONS,
+    KEY_LEN + IV_LEN,
+    "sha256"
+);
+const key = keyIv.slice(0, KEY_LEN);
+const iv = keyIv.slice(KEY_LEN);
+
+// 4) Descifrar
 const ciphertext = encrypted.slice(16);
-
-// Crea el decipher y obtiene el JSON descifrado
 const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+const decrypted = Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final(),
+]);
 
+// 5) Parsear JSON
 let serviceAccount: Record<string, any>;
 try {
     serviceAccount = JSON.parse(decrypted.toString("utf-8"));
-} catch (err) {
-    throw new Error("No se pudo parsear el JSON de credenciales desencriptadas");
+} catch {
+    throw new Error("No se pudo parsear el JSON desencriptado");
 }
 
-// -- Inicialización de Firebase Admin --------------------
+// 6) Inicializar Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
@@ -53,13 +61,7 @@ if (!admin.apps.length) {
     });
 }
 
-// Exporta el bucket para operaciones con Storage
 export const adminStorage = admin.storage().bucket(storageBucketName);
-
-/**
- * Verifica un ID token de Firebase, devolviendo el payload decodificado.
- * Lanza error si el token no es válido.
- */
 export async function verifyIdToken(idToken: string) {
     return await admin.auth().verifyIdToken(idToken);
 }
