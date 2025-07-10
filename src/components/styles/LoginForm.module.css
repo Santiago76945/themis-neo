@@ -188,7 +188,6 @@
   height: 1.25rem;
   accent-color: var(--color-accent);
   flex-shrink: 0;
-  margin-left: var(--space-3);
 }
 
 /* Label del texto junto al checkbox */
@@ -215,6 +214,29 @@
   color: var(--color-link-hover);
 }
 
+/* Para iPhone que tiene un problema de contraste en el checkbox */
 
+/* Sólo iOS Safari / WebKit móvil */
+@supports (-webkit-touch-callout: none) {
+  .termsCheckbox input[type="checkbox"] {
+    /* Restauramos estilo nativo para que Safari dibuje el check en blanco */
+    -webkit-appearance: checkbox;
+    appearance: checkbox;
+
+    /* Aseguramos fondo y borde para contraste */
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-accent);
+    border-radius: 4px;
+
+    /* Tamaño consistente */
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Opcional: al marcarlo, cambiamos fondo para reforzar el contraste */
+  .termsCheckbox input[type="checkbox"]:checked {
+    background-color: var(--color-accent);
+  }
+}
 
 
