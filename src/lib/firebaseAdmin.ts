@@ -6,8 +6,8 @@ import crypto from "crypto";
 import * as admin from "firebase-admin";
 
 // -- Parámetros de entorno --------------------------------
-const decryptKey = process.env.DECRYPT_KEY!;                // p.ej. "uWqG4vZ0X2lHbT7P8vJ3xY4rS6dZ9tH2kV8y1L4P3M="
-const storageBucketName = process.env.FIREBASE_STORAGE_BUCKET!; // "themis-971b4.appspot.com"
+const decryptKey = process.env.DECRYPT_KEY!;
+const storageBucketName = process.env.FIREBASE_STORAGE_BUCKET!;
 const ENC_PATH = path.join(process.cwd(), "serviceAccount.enc");
 
 // -- Logs de verificación (temp) --------------------------
@@ -36,7 +36,9 @@ try {
     // Verificar cabecera y extraer salt
     const header = encrypted.slice(0, 8).toString("ascii");
     if (header !== "Salted__") {
-        throw new Error("Formato de fichero cifrado inválido: cabecera no encontrada");
+        throw new Error(
+            "Formato de fichero cifrado inválido: cabecera no encontrada"
+        );
     }
     const salt = encrypted.slice(8, 16);
 
@@ -56,7 +58,11 @@ try {
 
     // Cifrado AES-256-CBC
     const ciphertext = encrypted.slice(16);
-    const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+    const decipher = crypto.createDecipheriv(
+        "aes-256-cbc",
+        key,
+        iv
+    );
     const decrypted = Buffer.concat([
         decipher.update(ciphertext),
         decipher.final(),
@@ -64,11 +70,17 @@ try {
 
     // Parsear JSON
     const jsonString = decrypted.toString("utf-8");
-    console.log("🛠️ JSON desencriptado snippet:", jsonString.slice(0, 50) + "...");
+    console.log(
+        "🛠️ JSON desencriptado snippet:",
+        jsonString.slice(0, 50) + "..."
+    );
     serviceAccount = JSON.parse(jsonString);
 
 } catch (err: any) {
-    console.error("❌ Error al desencriptar o parsear las credenciales:", err.message);
+    console.error(
+        "❌ Error al desencriptar o parsear las credenciales:",
+        err.message
+    );
     throw err;
 }
 
@@ -86,3 +98,6 @@ export const adminStorage = admin.storage().bucket(storageBucketName);
 export async function verifyIdToken(idToken: string) {
     return await admin.auth().verifyIdToken(idToken);
 }
+
+// Exporta la instancia de admin para importación por defecto
+export default admin;

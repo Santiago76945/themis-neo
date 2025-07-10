@@ -1,18 +1,10 @@
 // src/app/api/createUserProfile/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import * as admin from "firebase-admin";
+import admin from "@/lib/firebaseAdmin";    // Importa la instancia ya inicializada
 import { connectToDatabase } from "@/lib/db";
 import User from "@/lib/models/User";
-// IMPORT CORRECTO según tu archivo src/utils/generateCode.ts
 import { generateUniqueCode } from "@/utils/generateCode";
-
-if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!);
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-    });
-}
 
 export async function POST(request: NextRequest) {
     try {
