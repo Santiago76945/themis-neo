@@ -6,7 +6,7 @@ THEMIS-NEO
 │  │  ├─ coins-premium.png
 │  │  └─ mercadopago.svg
 │  │  └─ … (más iconos e imágenes)
-│  └─ template.docx                      # NUEVO (plantilla Word)
+│  └─ template.docx                         # NUEVO  – plantilla Word base
 │
 ├─ src
 │  ├─ app
@@ -17,9 +17,9 @@ THEMIS-NEO
 │  │  │  ├─ webhook/route.ts
 │  │  │  ├─ transcriptions/route.ts
 │  │  │  ├─ transcriptions/[id]/route.ts
-│  │  │  ├─ documents/route.ts              # POST & GET documentos
-│  │  │  ├─ documents/[id]/route.ts         # GET & DELETE por ID
-│  │  │  ├─ document-models/route.ts        # lista modelos JSON
+│  │  │  ├─ documents/route.ts               # POST & GET documentos
+│  │  │  ├─ documents/[id]/route.ts          # GET & DELETE por ID
+│  │  │  ├─ document-models/route.ts         # lista modelos JSON
 │  │  │  └─ documents-generator/[id]/route.ts  (legacy)
 │  │  │
 │  │  ├─ login/page.tsx
@@ -28,16 +28,18 @@ THEMIS-NEO
 │  │  │  ├─ audio-transcription
 │  │  │  │  ├─ page.tsx
 │  │  │  │  └─ [id]/page.tsx
-│  │  │  └─ documents-generator
-│  │  │     ├─ page.tsx                     # lista + crear documentos
-│  │  │     └─ [id]/page.tsx                # detalle de un documento
+│  │  │  ├─ documents-generator
+│  │  │  │  ├─ page.tsx                      # lista + crear documentos
+│  │  │  │  └─ [id]/page.tsx                 # detalle de un documento
+│  │  │  └─ signature-verification           # NUEVO – wizard de firma
+│  │  │     └─ page.tsx                      # página que monta <SignatureWizard/>
 │  │  │
 │  │  ├─ success.tsx
 │  │  ├─ layout.tsx
 │  │  └─ page.tsx
 │  │
 │  ├─ assets
-│  │  └─ templateBase64.ts                 # NUEVO (opcional base-64)
+│  │  └─ templateBase64.ts                  # NUEVO (opcional, plantilla en Base-64)
 │  │
 │  ├─ components
 │  │  ├─ Toolbar.tsx
@@ -46,7 +48,8 @@ THEMIS-NEO
 │  │  ├─ CheckoutButton.tsx
 │  │  ├─ ConsoleEffect.tsx
 │  │  ├─ ConsoleEffectWrapper.tsx
-│  │  ├─ DocxDownloadButton.tsx            # NUEVO (descarga .docx)
+│  │  ├─ DocxDownloadButton.tsx             # NUEVO (descarga .docx)
+│  │  ├─ SignatureWizard.tsx                # NUEVO (flujo de certificación)
 │  │  └─ styles
 │  │     ├─ AudioTranscription.module.css
 │  │     ├─ CoinPurchaseModal.module.css
@@ -68,20 +71,21 @@ THEMIS-NEO
 │  │  ├─ models
 │  │  │  ├─ User.ts
 │  │  │  ├─ Transcription.ts
-│  │  │  └─ Document.ts                    # esquema GeneratedDocument
+│  │  │  └─ Document.ts                     # esquema GeneratedDocument
 │  │  ├─ apiClient.ts
 │  │  ├─ db.ts
 │  │  ├─ firebase.ts
 │  │  ├─ firebaseAdmin.ts
 │  │  ├─ uploadToFirebase.ts
-│  │  └─ generateDocument.ts               # GPT-4o + coste tokens
+│  │  └─ generateDocument.ts                # GPT-4o + coste tokens
 │  │
 │  ├─ server
 │  │  └─ mercadoPago.ts
 │  │
 │  ├─ utils
 │  │  ├─ generateCode.ts
-│  │  └─ generateDoc.ts                    # NUEVO (Docxtemplater → Blob)
+│  │  ├─ generateDoc.ts                     # NUEVO (Docxtemplater → Blob)
+│  │  └─ generateCertificationCode.ts       # NUEVO (código único para wizard)
 │  │
 │  └─ hooks / servicios / … (otros helpers)
 │
@@ -91,4 +95,3 @@ THEMIS-NEO
 ├─ next.config.ts
 ├─ package.json
 └─ README.md
-

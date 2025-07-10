@@ -33,6 +33,11 @@ export default function LoginPage() {
             <>
                 <ConsoleEffectWrapper />
                 <div className="login-container">
+                    <img
+                        src="/images/themis-statue.png"
+                        alt="Estatua de Themis"
+                        className={styles.statue}
+                    />
                     <div className={styles.card}>
                         <div className={styles.logoContainer}>
                             <img

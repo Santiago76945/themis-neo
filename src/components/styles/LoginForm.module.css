@@ -151,3 +151,23 @@
   font-size: 0.8rem;
   color: #666666;
 }
+
+/* Estatua de Themis, alineada a la izquierda y centrada verticalmente dentro de .card */
+.statue {
+  position: absolute;
+  display: none;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  height: 100%;       /* ajusta la altura para que ocupe todo el alto de la tarjeta */
+  width: auto;        /* mantiene la proporción */
+  object-fit: contain;/* en caso de que quieras controlar recortes */
+  z-index: 5;         /* detrás de los contenidos principales si los superpone */
+}
+
+/* Mostrarla solo en pantallas anchas (≥1200px) */
+@media (min-width: 1200px) {
+  .statue {
+    display: block;
+  }
+}
