@@ -10,10 +10,6 @@ const decryptKey = process.env.DECRYPT_KEY!;
 const storageBucketName = process.env.FIREBASE_STORAGE_BUCKET!;
 const ENC_PATH = path.join(process.cwd(), "serviceAccount.enc");
 
-// -- Logs de verificación (temp) --------------------------
-console.log("🛠️ DECRYPT_KEY (length):", decryptKey?.length);
-console.log("🛠️ ENC_PATH exists?", fs.existsSync(ENC_PATH));
-
 // -- Validaciones iniciales -------------------------------
 if (!decryptKey) {
     throw new Error("DECRYPT_KEY debe estar definido en las variables de entorno");
@@ -70,10 +66,6 @@ try {
 
     // Parsear JSON
     const jsonString = decrypted.toString("utf-8");
-    console.log(
-        "🛠️ JSON desencriptado snippet:",
-        jsonString.slice(0, 50) + "..."
-    );
     serviceAccount = JSON.parse(jsonString);
 
 } catch (err: any) {

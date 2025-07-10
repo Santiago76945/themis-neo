@@ -2,15 +2,20 @@
 
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ConsoleEffectWrapper from "@/components/ConsoleEffectWrapper";
 import { useAuth } from "@/context/AuthContext";
+import Popup from "@/components/Popup";
 import styles from "@/components/styles/LoginForm.module.css";
+import terms from "@/data/terms/termsAndConditions.json";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { user, uniqueCode, signInWithGoogle, signOut } = useAuth();
+    const { user, uniqueCode, signInWithGoogle } = useAuth();
+    const [accepted, setAccepted] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [error, setError] = useState("");
 
     // Redirigir a /menu en cuanto tengamos ambos datos
     useEffect(() => {
@@ -20,12 +25,30 @@ export default function LoginPage() {
     }, [user, uniqueCode, router]);
 
     const handleGoogleLogin = async () => {
+        if (!accepted) {
+            setError("Debes aceptar los Términos y Condiciones");
+            return;
+        }
         try {
             await signInWithGoogle();
         } catch (error) {
             console.error("Error en login:", error);
         }
     };
+
+    // Contenido del pop-up de Términos y Condiciones
+    const renderTermsContent = () => (
+        <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <h2>{terms.title}</h2>
+            <p><em>Fecha de última actualización: {terms.lastUpdated}</em></p>
+            {terms.sections.map(section => (
+                <div key={section.id} style={{ marginBottom: '1rem' }}>
+                    <h3>{section.heading}</h3>
+                    <p>{section.content}</p>
+                </div>
+            ))}
+        </div>
+    );
 
     // 1) Si no está logeado, muestro login + efecto
     if (!user) {
@@ -58,11 +81,47 @@ export default function LoginPage() {
                                 Iniciar sesión con Google
                             </button>
                         </div>
-                        {/* Pie de página original */}
+
+                        <div className={styles.termsCheckbox}>
+                            <input
+                                type="checkbox"
+                                id="acceptTerms"
+                                checked={accepted}
+                                onChange={() => { setAccepted(!accepted); setError(""); }}
+                            />
+                            <label htmlFor="acceptTerms">
+                                Declaro haber leído y aceptado los{' '}
+                                <button
+                                    type="button"
+                                    onClick={() => setIsPopupOpen(true)}
+                                    style={{
+                                        textDecoration: 'underline',
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: 0,
+                                        color: 'inherit',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Términos y Condiciones
+                                </button>
+                            </label>
+                        </div>
+
+                        {error && (
+                            <p style={{ color: 'red', textAlign: 'center', marginTop: '0.5rem' }}>
+                                {error}
+                            </p>
+                        )}
+
                         <p className={styles.copyright}>
-                            © 2025 Themis Legal Assistant. Software propiedad de Santiago Haspert Piaggio.
-                            Todos los derechos reservados.
+                            © 2025 Themis Legal Assistant. Software propiedad de Santiago Haspert
+                            Piaggio. Todos los derechos reservados.
                         </p>
+
+                        <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)}>
+                            {renderTermsContent()}
+                        </Popup>
                     </div>
                 </div>
             </>

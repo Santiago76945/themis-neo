@@ -70,3 +70,12 @@
     text-align: justify;
 }
 
+/* Centrar todos los h2–h6 en el popup */
+.modalContent h2,
+.modalContent h3,
+.modalContent h4,
+.modalContent h5,
+.modalContent h6 {
+    text-align: center;
+    margin-bottom: var(--space-3);
+}

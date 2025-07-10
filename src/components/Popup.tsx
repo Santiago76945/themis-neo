@@ -16,7 +16,7 @@ export default function Popup({
     isOpen,
     onClose,
     children,
-    width = "400px",
+    width = "95vw",
     height = "auto",
     zIndex = 1000,
 }: PopupProps) {

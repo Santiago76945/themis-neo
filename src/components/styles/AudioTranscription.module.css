@@ -357,3 +357,7 @@
     margin-top: var(--space-4);
 }
 
+/* Botones iniciar / ver transcripción */
+.actionButton {
+  margin-top: 2rem; /* o el valor que necesites */
+}

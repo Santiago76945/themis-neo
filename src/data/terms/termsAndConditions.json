@@ -1,0 +1,66 @@
+{
+    "title": "Términos y Condiciones de Uso de Themis",
+    "lastUpdated": "10 de julio de 2025",
+    "sections": [
+        {
+            "id": 1,
+            "heading": "Ámbito de aplicación",
+            "content": "Al acceder o utilizar la plataforma Themis, usted acepta los presentes Términos y Condiciones. Esta plataforma ofrece servicios tecnológicos dirigidos al ámbito jurídico (conversión de audio a texto, certificación digital de firmas, almacenamiento de documentos, entre otros). El uso de Themis está enfocado a fines legales y profesionales. La plataforma no está diseñada ni dirigida a menores de edad ni a personas sin conocimientos jurídicos; al registrarse, el usuario declara ser mayor de 18 años y contar con la formación profesional necesaria, o se hace responsable de los errores que pudiera ocasionar por carecer de ella. El mero acceso a Themis implica la aceptación de estas condiciones, así como de la Política de Privacidad y demás políticas vinculadas que la plataforma provea."
+        },
+        {
+            "id": 2,
+            "heading": "Elegibilidad del Usuario",
+            "content": "El usuario debe ser mayor de 18 años. Themis no permite el registro ni la prestación de servicios a menores. La plataforma está dirigida exclusivamente a profesionales del derecho. Queda desaconsejado permitir el uso de la cuenta por parte de terceros o personas no calificadas, y la plataforma no se hará responsable por ello. El usuario se compromete a proporcionar información veraz y completa al registrarse y a actualizarla en caso de cambios. Las cuentas creadas con datos falsos o en infracción de cualquiera de estas normas podrán ser canceladas sin previo aviso."
+        },
+        {
+            "id": 3,
+            "heading": "Descripción del Servicio y Limitaciones",
+            "content": "Themis proporciona herramientas basadas en inteligencia artificial para apoyar tareas jurídicas, como transcripción de audios, generación de documentos y certificación electrónica. Sin embargo, la IA es solo una ayuda tecnológica y reviste un carácter experimental: los resultados obtenidos deben ser revisados y validados por un profesional humano. Themis no presta servicios de asesoría legal, no ejerce la profesión jurídica ni sustituye el juicio profesional del abogado. En ningún caso la plataforma garantiza la exactitud absoluta de la información generada. El usuario reconoce que Themis es únicamente un asistente facilitador de tareas y que la responsabilidad final sobre cualquier documento, función o trámite recae en él."
+        },
+        {
+            "id": 4,
+            "heading": "Licencia de Uso y Propiedad Intelectual",
+            "content": "Todos los derechos de propiedad intelectual e industrial sobre Themis —incluyendo su código fuente, algoritmos, bases de datos, diseños de interfaz, nombres comerciales, marcas y logotipos— son de titularidad exclusiva de Santiago Haspert Piaggio o de sus licenciantes. El usuario recibe únicamente una licencia limitada, revocable y no exclusiva para usar la plataforma conforme a estos Términos. El acceso al servicio no otorga ningún derecho de propiedad sobre el software, las bases de datos o el contenido protegido. Queda prohibido copiar, modificar, reproducir, descompilar, hacer ingeniería inversa, distribuir, sublicenciar, alquilar o transferir de cualquier modo la tecnología o el contenido de Themis sin autorización escrita previa."
+        },
+        {
+            "id": 5,
+            "heading": "Uso Permitido y Responsabilidades del Usuario",
+            "content": "El usuario se compromete a utilizar Themis solo para fines lícitos, éticos y profesionales, de acuerdo con la legislación aplicable. Queda prohibido emplear la plataforma para actividades ilegales, fraudulentas o contrarias a derecho; infringir derechos de autor o la privacidad de terceros; utilizar técnicas automatizadas que comprometan la seguridad del servicio; compartir credenciales con terceros; sublicenciar o revender el acceso sin consentimiento; desarrollar productos que compitan con nuestra IA; o difundir contenido ofensivo o discriminatorio. El incumplimiento habilita a Themis a suspender o cancelar el acceso sin previo aviso."
+        },
+        {
+            "id": 6,
+            "heading": "Almacenamiento de Archivos",
+            "content": "Themis ofrece almacenamiento en la nube para documentos y audios procesados, pero no garantiza su conservación indefinida. Según decisiones operativas, los contenidos pueden ser eliminados en cualquier momento. Es responsabilidad del usuario respaldar oportunamente sus documentos importantes, manteniendo copias de seguridad fuera de Themis. La plataforma no se responsabiliza por la pérdida accidental o expiración de archivos. Incluso los archivos relativos a certificaciones presentes en nuestra plataforma pueden verse afectados por cuestiones operativas, presupuestarias o decisiones empresariales que lleven a su eliminación."
+        },
+        {
+            "id": 7,
+            "heading": "Certificación Digital de Firmas",
+            "content": "La funcionalidad de certificación digital de firmas utiliza un sistema biométrico y de encriptado propio mediante el cual el usuario, al firmar un documento en papel con firma manuscrita, declara con sus propias palabras que la firma le pertenece; sin embargo, esta certificación electrónica no equivale a la validez jurídica de una firma presencial certificada por autoridad pública. El certificado generado tiene efecto de prueba en contextos legales, pero no reemplaza la certificación física cuando la ley lo exige. El usuario asume plena responsabilidad por el uso del código o certificado producido, reconociendo las limitaciones legales existentes."
+        },
+        {
+            "id": 8,
+            "heading": "ThemiCoins y Tarifas",
+            "content": "Los ThemiCoins son créditos virtuales internos para acceder a las funciones de Themis. No tienen valor fuera de la plataforma: son intransferibles, no reembolsables y no canjeables por dinero u otros bienes. Cada servicio tarifado consume ThemiCoins según el tamaño del archivo, la complejidad, los tokens utilizados o criterios definidos por la desarrolladora. El costo se muestra antes de confirmar la operación de manera ejemplificativa; puede haber errores en el cálculo y es solo orientativo. El usuario autoriza a Themis a debitar automáticamente los créditos de su cuenta. Themis se reserva el derecho de ajustar las tarifas internas."
+        },
+        {
+            "id": 9,
+            "heading": "Protección de Datos Personales y Confidencialidad",
+            "content": "Themis procesa los datos personales conforme a la legislación aplicable (Ley 25.326 y, de ser relevante, estándares internacionales). Los datos recabados se utilizan únicamente para prestar el servicio y mejorar la plataforma, según lo descrito en la Política de Privacidad. El usuario es responsable de mantener la confidencialidad de sus credenciales y debe notificar a Themis de inmediato si sospecha la vulneración de su cuenta. Themis no divulgará ni compartirá datos personales con terceros no autorizados, salvo exigencia legal. El usuario acepta recibir comunicaciones relacionadas con la plataforma en los medios proporcionados."
+        },
+        {
+            "id": 10,
+            "heading": "Garantías y Limitación de Responsabilidad",
+            "content": "Themis se provee “tal cual” y “según disponibilidad”, sin garantías de funcionamiento ininterrumpido ni de corrección de errores. Themis no será responsable por daños directos o indirectos, pérdidas de datos, lucro cesante, gastos profesionales, daños emergentes, errores de IA, interrupciones del servicio o consecuencias de uso indebido. Estas limitaciones aplican en la máxima extensión permitida por la ley, excepto aquellas responsabilidades que no puedan eximirse por imperio de la ley."
+        },
+        {
+            "id": 11,
+            "heading": "Modificación del Servicio y Términos",
+            "content": "Themis se reserva el derecho de modificar total o parcialmente la plataforma, sus características o estos Términos en cualquier momento. Los cambios serán comunicados con antelación razonable mediante aviso en la web o correo electrónico. El uso continuado después de la publicación de cambios implica la aceptación de los nuevos términos. Themis puede suspender o cancelar el acceso del usuario sin previo aviso en caso de incumplimiento grave o para tareas de mantenimiento."
+        },
+        {
+            "id": 12,
+            "heading": "Ley Aplicable y Jurisdicción",
+            "content": "Estos Términos se rigen por las leyes de la República Argentina. Para las disputas derivadas de la relación contractual, las partes se someten a los tribunales ordinarios de la ciudad de Córdoba, provincia de Córdoba, renunciando a cualquier otro fuero o jurisdicción."
+        }
+    ]
+}
