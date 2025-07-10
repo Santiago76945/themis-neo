@@ -1,0 +1,5 @@
+  {
+    "title": "Cédula de Notificación Personal",
+    "content": "Expediente N° [NÚMERO] – \"[Carátula del Expediente]\"\nJuzgado [NÚMERO y Nominación] [Fuero] de [LOCALIDAD]\nSecretaría [NÚMERO]\n\nSr./Sra. [NOMBRE COMPLETO DEL DESTINATARIO] – DNI [NÚMERO]\nDomicilio: [DOMICILIO DEL DESTINATARIO]\n\nSe le notifica que en los autos caratulados \"[Actor] c/ [Demandado] – [Materia]\" (Expte. Nº [NÚMERO]) se ha dictado la resolución de fecha [FECHA] que en su parte pertinente dispone: \"[texto de la parte resolutiva a notificar]\". Queda Ud. debidamente notificado/a.\nConste.\n\n[Ciudad], [Fecha].\n[Firma y sello del Abogado Notificante] – Mat. [NÚMERO]",
+    "recommendation": "Incluir: identificación completa del juzgado interviniente (número, nominación y fuero), carátula y número de expediente, nombre completo, DNI y domicilio del destinatario, texto de la resolución o actuación que se notifica (transcribiendo su parte pertinente o indicando traslado de demanda con copias adjuntas), fecha de la resolución notificada, y firma con sello del abogado que prepara la cédula."
+  }

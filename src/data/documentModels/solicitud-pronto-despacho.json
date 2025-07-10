@@ -1,0 +1,5 @@
+{
+    "title": "Solicitud de Pronto Despacho",
+    "content": "Expediente N° [NÚMERO]\nPRONTO DESPACHO\nSr/a. Director/a del [Nombre del Departamento o Secretaría], Provincia de Córdoba\nS/D\n\nDe mi mayor consideración: [NOMBRE Y APELLIDO], DNI [NÚMERO], con domicilio en [DIRECCIÓN COMPLETA], me dirijo a Ud. a fin de solicitarle, en carácter de pronto despacho, la resolución del expediente N° [NÚMERO], que tramita por ante el [Nombre del Departamento o Secretaría competente] desde el día [FECHA]. En el mencionado expediente se peticiona [breve descripción de la solicitud principal]. La demora en la resolución del mismo me causa perjuicios.\n\nSin otro particular, saludo a Ud. muy atentamente.\n\n[Firma y aclaración]\n[Nombre del abogado o parte solicitante] – Mat. [Número]",
+    "recommendation": "Incluir: número del expediente, cargo y dependencia del destinatario, nombre y documento del solicitante, domicilio, fecha de inicio del expediente y motivo principal de la petición."
+}
