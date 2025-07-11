@@ -28,13 +28,12 @@ export default function HerramientasParaAbogados() {
                 />
             </picture>
 
-
             {/* Encabezado magistral */}
             <header className={`${styles.header}`}>
                 <h1>Themis: El Futuro de la Práctica Jurídica</h1>
             </header>
 
-            <p>
+            <p className={`${styles.bodyText}`}>
                 Herramientas para abogados, diseñadas por abogados. Tecnología de vanguardia, accesible y fácil de usar. Incorporamos lo último en inteligencia artificial para simplificar tus tareas jurídicas diarias y llevar tu estudio jurídico al siguiente nivel.
             </p>
 

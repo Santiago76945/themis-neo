@@ -49,7 +49,12 @@
     margin: 0;
 }
 
-/* primero la clase luego el elemento para que funcione el css */
 .actions a {
     text-decoration: none;
+}
+
+.bodyText,
+.sectionText {
+    text-align: justify;
+    text-justify: inter-word;
 }
