@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import Popup from "@/components/Popup";
 import styles from "@/components/styles/LoginForm.module.css";
 import terms from "@/data/terms/termsAndConditions.json";
+import Link from "next/link";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -81,6 +82,13 @@ export default function LoginPage() {
                                 Iniciar sesión con Google
                             </button>
                         </div>
+
+                        <Link
+                            href="/herramientas-para-abogados"
+                            className={`${styles.btn} ${styles.btnGoogle}`}
+                        >
+                            ¿Qué me ofrece Themis?
+                        </Link>
 
                         <div className={styles.termsCheckbox}>
                             <input

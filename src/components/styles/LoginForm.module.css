@@ -111,6 +111,7 @@
 .btnGoogle {
   background: linear-gradient(45deg, #3c3c3d, #4c4c4d);
   color: var(--color-accent);
+  text-decoration: none;
 }
 
 .btnApple {
@@ -251,4 +252,14 @@
   .termsCheckbox input[type="checkbox"]:checked {
     background-color: var(--color-accent);
   }
+}
+
+.logoSubtitle {
+  margin-top: 0;
+  margin-bottom: var(--space-1);
+}
+
+.logoTitle {
+  margin-top: 0;
+  margin-bottom: 0;
 }

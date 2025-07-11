@@ -272,5 +272,25 @@ textarea {
     box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.2);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5 {
+    text-align: center;
+    margin: var(--space-3) 0 var(--space-2);
+    padding: var(--space-1) 0;
+    line-height: 1.5;
+}
+
+.header {
+    /* centra horizontalmente */
+    justify-content: center;
+}
 
 
+p {
+    line-height: 1.5;
+    text-align: justify;
+    text-justify: inter-word; 
+}

@@ -1,0 +1,98 @@
+/* src/components/styles/HerramientasParaAbogados.module.css */
+
+/* Contenedor raíz */
+.root {
+    padding: 0;
+}
+
+/* Hero responsivo: imágenes superpuestas y controladas por media queries */
+.hero {
+    position: relative;
+    width: 100vw;
+    margin: 0 calc(50% - 50vw);
+    overflow: hidden;
+}
+
+.hero img {
+    display: none;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Versión móvil (default) */
+.hero img.heroSmall {
+    display: block;
+}
+
+/* Pantallas medianas */
+@media (min-width: var(--breakpoint-md)) {
+    .hero img.heroSmall {
+        display: none;
+    }
+
+    .hero img.heroMedium {
+        display: block;
+    }
+}
+
+/* Pantallas grandes */
+@media (min-width: var(--breakpoint-xl)) {
+    .hero img.heroMedium {
+        display: none;
+    }
+
+    .hero img.heroLarge {
+        display: block;
+    }
+}
+
+/* Sección individual */
+.section {
+    margin: var(--space-4) 0;
+    padding: var(--space-2);
+    background-color: var(--color-surface);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    text-align: left;
+}
+
+/* Imagen de sección */
+.sectionImage {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: var(--space-3);
+}
+
+/* Título de sección */
+.sectionTitle {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-2);
+}
+
+/* Texto de sección */
+.sectionText {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--color-on-surface);
+}
+
+/* Contenedor de botones */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-5) 0;
+}
+
+.actions .btn {
+    margin: 0;
+}
+
+/* primero la clase luego el elemento para que funcione el css */
+.actions a {
+    text-decoration: none;
+}
