@@ -62,3 +62,7 @@
     margin-left: var(--space-1);
     margin-right: var(--space-1);
 }
+
+.bodyText {
+    padding: 0 var(--space-4);
+}
