@@ -31,7 +31,7 @@
     /* Esto le da el ancho a la card principal dentro del body */
     width: 95vw;
     max-width: 600px;
-    height: 85vh;
+    max-height: 85vh;
     overflow: hidden;
     /* Quité el borde y fondo extra para no alterar colores */
     border-radius: 0.5rem;
@@ -49,7 +49,6 @@
 .wizardContainer {
     display: flex;
     flex-direction: column;
-    height: 100%;
     padding: var(--space-4);
     gap: var(--space-3);
     text-align: center;
@@ -101,7 +100,6 @@
     flex-direction: column;
     flex: 1;
     justify-content: center;
-    margin: 0 0 var(--space-3);
     text-align: center;
 }
 
@@ -232,6 +230,7 @@
 }
 
 .tabButton {
+    margin-top: var(--space-1);
     flex: 1;
     display: flex;
     align-items: center;
@@ -436,3 +435,23 @@
     margin-bottom: 20px;
 }
 
+.wizardContainer {
+    margin: var(--space-1) 0;
+    padding: 0;
+}
+
+.mainTitle {
+    margin-bottom: 0;
+}
+
+.stepIndicator{
+    margin-bottom: 0;
+}
+
+.section {
+    padding-bottom: 0;
+}
+
+.mainSection {
+    background-color: blue;
+}
