@@ -5,49 +5,6 @@
     padding: 0;
 }
 
-/* Hero responsivo: imágenes superpuestas y controladas por media queries */
-.hero {
-    position: relative;
-    width: 100vw;
-    margin: 0 calc(50% - 50vw);
-    overflow: hidden;
-}
-
-.hero img {
-    display: none;
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    object-position: center;
-}
-
-/* Versión móvil (default) */
-.hero img.heroSmall {
-    display: block;
-}
-
-/* Pantallas medianas */
-@media (min-width: var(--breakpoint-md)) {
-    .hero img.heroSmall {
-        display: none;
-    }
-
-    .hero img.heroMedium {
-        display: block;
-    }
-}
-
-/* Pantallas grandes */
-@media (min-width: var(--breakpoint-xl)) {
-    .hero img.heroMedium {
-        display: none;
-    }
-
-    .hero img.heroLarge {
-        display: block;
-    }
-}
-
 /* Sección individual */
 .section {
     margin: var(--space-4) 0;

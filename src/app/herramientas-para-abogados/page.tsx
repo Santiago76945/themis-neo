@@ -9,26 +9,25 @@ export default function HerramientasParaAbogados() {
     return (
         <div className={`${styles.root} container`}>
             {/* Hero responsive con tres imágenes */}
-            <div className={styles.hero}>
-                {/* Móvil por defecto */}
-                <img
-                    src="/images/themis-hero-image-vertical.png"
-                    alt="Themis hero mobile"
-                    className={styles.heroSmall}
+            <picture style={{ display: 'block', width: '100vw', margin: '0 calc(50% - 50vw)' }}>
+                {/* Muy anchas */}
+                <source
+                    srcSet="/images/hero-image-large.png"
+                    media="(min-width: 1280px)"
                 />
-                {/* Pantallas ≥768px */}
-                <img
-                    src="/images/hero-image-horizontal.png"
-                    alt="Themis hero medium"
-                    className={styles.heroMedium}
+                {/* Pantallas medias */}
+                <source
+                    srcSet="/images/hero-image-horizontal.png"
+                    media="(min-width: 768px)"
                 />
-                {/* Pantallas ≥1280px */}
+                {/* Móviles (fallback) */}
                 <img
-                    src="/images/hero-image-large.png"
-                    alt="Themis hero large"
-                    className={styles.heroLarge}
+                    src="/images/hero-image-vertical.png"
+                    alt="Themis: visión de la plataforma"
+                    style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
-            </div>
+            </picture>
+
 
             {/* Encabezado magistral */}
             <header className={`${styles.header}`}>
